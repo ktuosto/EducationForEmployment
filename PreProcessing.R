@@ -25,6 +25,31 @@ n_distinct(AppsJoin$Contact.Case.Safe.ID)
 
 ##Fewer unique IDs in Apps than is ESC for some reason, so in future removals also remove those not in Apps in addition to those not in ESC
 
+
+## Remove people not in  Apps from ESC
+ESCJoin<-ESC%>%
+  semi_join(AppsJoin,by="Contact.Case.Safe.ID")
+
+n_distinct(ESCFinal$Contact.Case.Safe.ID)
+
+#Create DeIdentifying key
+
+ContactKey<-ESCJoin%>%
+  group_by(Contact.Case.Safe.ID)%>%
+  mutate(ContactID=cur_group_id())%>%
+  group_by(Contact.Case.Safe.ID,ContactID)%>%
+  summarise(n=n())%>%
+  dplyr::select(1,2)
+
+##Remove Actual Contact ID from ESC
+ESCFinal<-ESCJoin%>%
+  left_join(ContactKey,by="Contact.Case.Safe.ID")%>%
+  dplyr::select(-1)%>%
+  dplyr::relocate("ContactID",before=1)
+
+n_distinct(ESCFinal$ContactID)
+
+
 ## Remove people not in ESC or Apps from Contacts
 ContactsJoin<-Contacts%>%
   semi_join(ESC,by="Contact.Case.Safe.ID")%>%
@@ -33,13 +58,18 @@ ContactsJoin<-Contacts%>%
 n_distinct(ContactsJoin$Contact.Case.Safe.ID)
 
 
-## Remove people not in ESC or Apps from PrePost
+
+## Remove people not in ESC or Apps from PrePost, remove real contact ID
 PrePostFinal<-PrePost%>%
   semi_join(ESC,by="Contact.Case.Safe.ID")%>%
-  semi_join(AppsJoin,by="Contact.Case.Safe.ID")
+  semi_join(AppsJoin,by="Contact.Case.Safe.ID")%>%
+  left_join(ContactKey,by="Contact.Case.Safe.ID")%>%
+  dplyr::select(-1)%>%
+  dplyr::relocate("ContactID",before=1)
 
 
 n_distinct(PrePostFinal$Contact.Case.Safe.ID)
+n_distinct(PrePostFinal$ContactID)
 
 
 ##Get most recent application, and add field that sums number of apps per person
@@ -50,22 +80,38 @@ AppsFinal<-AppsJoin%>%
   group_by(Contact.Case.Safe.ID)%>%
   slice(which.max(Application..Created.Date))
 
+n_distinct(AppsFinal$Contact.Case.Safe.ID)
 
-##Join Most Recent App to Contacts
+
+
+##Join Most Recent App to Contacts, remove real contact ID from final contacts
 ContactsFinal<-ContactsJoin%>%
-  left_join(AppsFinal,by="Contact.Case.Safe.ID")
+  left_join(AppsFinal,by="Contact.Case.Safe.ID")%>%
+  left_join(ContactKey,by="Contact.Case.Safe.ID")%>%
+  dplyr::select(-1)%>%
+  dplyr::relocate("ContactID",before=1)
+
+n_distinct(ContactsFinal$ContactID)
+
+##Check there are no original contact IDs left - should all be NULL
+
+unique(ContactsFinal$Contact.Case.Safe.ID)
+unique(PrePostFinal$Contact.Case.Safe.ID)
+unique(ESCFinal$Contact.Case.Safe.ID)
 
 
 ##Write Final Data back to Folder on USB
+
 
 setwd("D:/For Data Dive")
 
 write.csv(ContactsFinal,"Contacts.csv")
 write.csv(PrePostFinal,"PrePost Surveys.csv")
-write.csv(ESC,"Employment Status Checks.csv")
+write.csv(ESCFinal,"Employment Status Checks.csv")
 
+##Write Lookup Keys
 
-
-
+setwd("D:/Lookup Keys")
+write.csv(ContactKey,"ContactKey.csv")
 
 
