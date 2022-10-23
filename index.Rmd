@@ -1,0 +1,74 @@
+---
+title: "Education for Employment"
+output:
+  html_document: 
+    theme: journal
+    toc: TRUE
+    toc_float: TRUE
+    toc_depth: 3
+    toc_collapsed: TRUE
+    css: ["style.css","MyFontsWebfontsKit.css"]
+  pdf_document: default
+  word_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, warning=FALSE, message=FALSE)
+#install.packages("leaflet")
+#install.packages("htmlwidgets")
+library(leaflet)
+library(htmlwidgets)
+library(sf)
+library(tidyverse)
+library(tmap)
+library(spatstat)
+library(maptools)
+library(raster)
+library(tidycensus)
+library(sf)
+library(jsonlite)
+library(geojsonio)
+library(hrbrthemes)
+library(formattable)
+library(scales)
+library(ggrepel)
+library(ggthemes)
+library(kableExtra)
+library(googlesheets4)
+
+
+percent <- function(x, digits = 1, format = "f", ...) {
+  paste0(formatC(100 * x, format = format, digits = digits, ...), "%")
+}
+
+
+```
+
+
+### Overview
+
+Education For Employment (EFE) is the leading nonprofit that trains youth and links them to jobs across the Middle East and North Africa (MENA).  This pivotal region is the hardest place on the planet for youth to get their first job – they are three times more likely to be unemployed than older adults. 
+
+EFE is interested in the effectiveness of their programs, particularly whether graduates find stable employment. We have data on about 7,000 participants in almost 500 program cohorts spread across 8 countries. Participants bring diverse skills, interests, and backgrounds. Programs employ a variety of training models and placement policies. How well are different programs working, and for whom?
+
+
+### Data
+
+EFE has an Salesforce database that houses all information about the organization's programs, participants, and job placement and retention outcomes. The datasets used in this project include: 
+
+* Participant demographics (program applications)
+* Pre- and post- program participation surveys (job skills, confidence,…)
+* Employment information at 3-month intervals for up to 2 years
+
+
+### Data Pre-Processing
+
+
+
+
+
+
+```{r}
+
+```
+
