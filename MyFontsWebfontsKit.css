@@ -1,6 +1,6 @@
 /**
- * @license 
- * MyFonts Webfont Build ID 3633353, 2018-09-01T18:58:36-0400
+ * @license
+ * MyFonts Webfont Build ID 3867246, 2020-12-16T11:57:38-0500
  * 
  * The fonts listed in this notice are subject to the End User License
  * Agreement(s) entered into by the website owner. All other parties are 
@@ -8,113 +8,79 @@
  * 
  * You may obtain a valid license at the URLs below.
  * 
- * Webfont: AvertaStd-Black by Intelligent Design
- * URL: https://www.myfonts.com/fonts/intelligent-foundry/averta-standard/black/
- * 
- * Webfont: AvertaStd-BlackItalic by Intelligent Design
- * URL: https://www.myfonts.com/fonts/intelligent-foundry/averta-standard/black-italic/
- * 
- * Webfont: AvertaStd-Bold by Intelligent Design
- * URL: https://www.myfonts.com/fonts/intelligent-foundry/averta-standard/bold/
- * 
- * Webfont: AvertaStd-Extrabold by Intelligent Design
- * URL: https://www.myfonts.com/fonts/intelligent-foundry/averta-standard/extra-bold/
- * 
- * Webfont: AvertaStd-ExtraboldItalic by Intelligent Design
- * URL: https://www.myfonts.com/fonts/intelligent-foundry/averta-standard/extra-bold-italic/
- * 
- * Webfont: AvertaStd-BoldItalic by Intelligent Design
- * URL: https://www.myfonts.com/fonts/intelligent-foundry/averta-standard/bold-italic/
- * 
- * Webfont: AvertaStd-Extrathin by Intelligent Design
- * URL: https://www.myfonts.com/fonts/intelligent-foundry/averta-standard/extra-thin/
- * 
- * Webfont: AvertaStd-ExtrathinItalic by Intelligent Design
- * URL: https://www.myfonts.com/fonts/intelligent-foundry/averta-standard/extra-thin-italic/
- * 
- * Webfont: AvertaStd-Light by Intelligent Design
- * URL: https://www.myfonts.com/fonts/intelligent-foundry/averta-standard/light/
- * 
- * Webfont: AvertaStd-LightItalic by Intelligent Design
- * URL: https://www.myfonts.com/fonts/intelligent-foundry/averta-standard/light-italic/
- * 
- * Webfont: AvertaStd-Regular by Intelligent Design
- * URL: https://www.myfonts.com/fonts/intelligent-foundry/averta-standard/regular/
- * 
- * Webfont: AvertaStd-RegularItalic by Intelligent Design
- * URL: https://www.myfonts.com/fonts/intelligent-foundry/averta-standard/regular-italic/
- * 
- * Webfont: AvertaStd-SemiboldItalic by Intelligent Design
- * URL: https://www.myfonts.com/fonts/intelligent-foundry/averta-standard/semibold-italic/
- * 
- * Webfont: AvertaStd-Semibold by Intelligent Design
- * URL: https://www.myfonts.com/fonts/intelligent-foundry/averta-standard/semibold/
- * 
- * Webfont: AvertaStd-Thin by Intelligent Design
- * URL: https://www.myfonts.com/fonts/intelligent-foundry/averta-standard/thin/
- * 
- * Webfont: AvertaStd-ThinItalic by Intelligent Design
- * URL: https://www.myfonts.com/fonts/intelligent-foundry/averta-standard/thin-italic/
+ * Webfont: HelveticaLTWXX-Roman by Linotype
+ * URL: https://www.myfonts.com/fonts/linotype/helvetica/pro-regular/
+ * Copyright: Copyright © 2014 Monotype Imaging Inc. All rights reserved.
  * 
  * 
- * License: https://www.myfonts.com/viewlicense?type=web&buildid=3633353
- * Licensed pageviews: 10,000
- * Webfonts copyright: Copyright (c) 2015 by Kostas Bartsokas. All rights reserved.
  * 
- * © 2018 MyFonts Inc
-*/
+ * © 2020 MyFonts Incn*/
 
 
-/* @import must be at top of file, otherwise CSS will not work */
-@import url("//hello.myfonts.net/count/3770c9");
 
-@font-face {font-family: 'AvertaStd';src: url('webfonts/3770C9_A_0.eot');src: url('webfonts/3770C9_A_0.eot?#iefix') format('embedded-opentype'),url('webfonts/3770C9_A_0.woff2') format('woff2'),url('webfonts/3770C9_A_0.woff') format('woff'),url('webfonts/3770C9_A_0.ttf') format('truetype');}
-@font-face {font-family: 'AvertaStd';src: url('webfonts/3770C9_2_0.eot');src: url('webfonts/3770C9_2_0.eot?#iefix') format('embedded-opentype'),url('webfonts/3770C9_2_0.woff2') format('woff2'),url('webfonts/3770C9_2_0.woff') format('woff'),url('webfonts/3770C9_2_0.ttf') format('truetype'); font-weight: bold;}
-@font-face {font-family: 'AvertaStd';src: url('webfonts/3770C9_B_0.eot');src: url('webfonts/3770C9_B_0.eot?#iefix') format('embedded-opentype'),url('webfonts/3770C9_B_0.woff2') format('woff2'),url('webfonts/3770C9_B_0.woff') format('woff'),url('webfonts/3770C9_B_0.ttf') format('truetype'); font-style: italic; }
-@font-face {font-family: 'AvertaStd';src: url('webfonts/3770C9_5_0.eot');src: url('webfonts/3770C9_5_0.eot?#iefix') format('embedded-opentype'),url('webfonts/3770C9_5_0.woff2') format('woff2'),url('webfonts/3770C9_5_0.woff') format('woff'),url('webfonts/3770C9_5_0.ttf') format('truetype'); font-weight: bold; font-style: italic;}
-@font-face {font-family: 'AvertaStd-Semibold';src: url('webfonts/3770C9_D_0.eot');src: url('webfonts/3770C9_D_0.eot?#iefix') format('embedded-opentype'),url('webfonts/3770C9_D_0.woff2') format('woff2'),url('webfonts/3770C9_D_0.woff') format('woff'),url('webfonts/3770C9_D_0.ttf') format('truetype');}
-@font-face {font-family: 'AvertaStd-Black';src: url('webfonts/3770C9_0_0.eot');src: url('webfonts/3770C9_0_0.eot?#iefix') format('embedded-opentype'),url('webfonts/3770C9_0_0.woff2') format('woff2'),url('webfonts/3770C9_0_0.woff') format('woff'),url('webfonts/3770C9_0_0.ttf') format('truetype');}
   
-/*@font-face {font-family: 'AvertaStd-Black';src: url('webfonts/3770C9_0_0.eot');src: url('webfonts/3770C9_0_0.eot?#iefix') format('embedded-opentype'),url('webfonts/3770C9_0_0.woff2') format('woff2'),url('webfonts/3770C9_0_0.woff') format('woff'),url('webfonts/3770C9_0_0.ttf') format('truetype');}*/
- 
-  
-/*@font-face {font-family: 'AvertaStd-BlackItalic';src: url('webfonts/3770C9_1_0.eot');src: url('webfonts/3770C9_1_0.eot?#iefix') format('embedded-opentype'),url('webfonts/3770C9_1_0.woff2') format('woff2'),url('webfonts/3770C9_1_0.woff') format('woff'),url('webfonts/3770C9_1_0.ttf') format('truetype');}*/
- 
-  
-  
-/*@font-face {font-family: 'AvertaStd-Extrabold';src: url('webfonts/3770C9_3_0.eot');src: url('webfonts/3770C9_3_0.eot?#iefix') format('embedded-opentype'),url('webfonts/3770C9_3_0.woff2') format('woff2'),url('webfonts/3770C9_3_0.woff') format('woff'),url('webfonts/3770C9_3_0.ttf') format('truetype');}
- 
-  
-@font-face {font-family: 'AvertaStd-ExtraboldItalic';src: url('webfonts/3770C9_4_0.eot');src: url('webfonts/3770C9_4_0.eot?#iefix') format('embedded-opentype'),url('webfonts/3770C9_4_0.woff2') format('woff2'),url('webfonts/3770C9_4_0.woff') format('woff'),url('webfonts/3770C9_4_0.ttf') format('truetype');}
- 
-  
- 
-  
-@font-face {font-family: 'AvertaStd-Extrathin';src: url('webfonts/3770C9_6_0.eot');src: url('webfonts/3770C9_6_0.eot?#iefix') format('embedded-opentype'),url('webfonts/3770C9_6_0.woff2') format('woff2'),url('webfonts/3770C9_6_0.woff') format('woff'),url('webfonts/3770C9_6_0.ttf') format('truetype');}
- 
-  
-@font-face {font-family: 'AvertaStd-ExtrathinItalic';src: url('webfonts/3770C9_7_0.eot');src: url('webfonts/3770C9_7_0.eot?#iefix') format('embedded-opentype'),url('webfonts/3770C9_7_0.woff2') format('woff2'),url('webfonts/3770C9_7_0.woff') format('woff'),url('webfonts/3770C9_7_0.ttf') format('truetype');}
- 
-  
-@font-face {font-family: 'AvertaStd-Light';src: url('webfonts/3770C9_8_0.eot');src: url('webfonts/3770C9_8_0.eot?#iefix') format('embedded-opentype'),url('webfonts/3770C9_8_0.woff2') format('woff2'),url('webfonts/3770C9_8_0.woff') format('woff'),url('webfonts/3770C9_8_0.ttf') format('truetype');}
- 
-  
-@font-face {font-family: 'AvertaStd-LightItalic';src: url('webfonts/3770C9_9_0.eot');src: url('webfonts/3770C9_9_0.eot?#iefix') format('embedded-opentype'),url('webfonts/3770C9_9_0.woff2') format('woff2'),url('webfonts/3770C9_9_0.woff') format('woff'),url('webfonts/3770C9_9_0.ttf') format('truetype');}
- 
-  
- 
-  
- 
-  
-@font-face {font-family: 'AvertaStd-SemiboldItalic';src: url('webfonts/3770C9_C_0.eot');src: url('webfonts/3770C9_C_0.eot?#iefix') format('embedded-opentype'),url('webfonts/3770C9_C_0.woff2') format('woff2'),url('webfonts/3770C9_C_0.woff') format('woff'),url('webfonts/3770C9_C_0.ttf') format('truetype');}
- 
-  
-@font-face {font-family: 'AvertaStd-Semibold';src: url('webfonts/3770C9_D_0.eot');src: url('webfonts/3770C9_D_0.eot?#iefix') format('embedded-opentype'),url('webfonts/3770C9_D_0.woff2') format('woff2'),url('webfonts/3770C9_D_0.woff') format('woff'),url('webfonts/3770C9_D_0.ttf') format('truetype');}
- 
-  
-@font-face {font-family: 'AvertaStd-Thin';src: url('webfonts/3770C9_E_0.eot');src: url('webfonts/3770C9_E_0.eot?#iefix') format('embedded-opentype'),url('webfonts/3770C9_E_0.woff2') format('woff2'),url('webfonts/3770C9_E_0.woff') format('woff'),url('webfonts/3770C9_E_0.ttf') format('truetype');}
- 
-  
-@font-face {font-family: 'AvertaStd-ThinItalic';src: url('webfonts/3770C9_F_0.eot');src: url('webfonts/3770C9_F_0.eot?#iefix') format('embedded-opentype'),url('webfonts/3770C9_F_0.woff2') format('woff2'),url('webfonts/3770C9_F_0.woff') format('woff'),url('webfonts/3770C9_F_0.ttf') format('truetype');}
-*/
- 
+@font-face {
+  font-family: "AvertaStdThin";
+  src: url('webFonts/AvertaStdThin/font.woff2') format('woff2'), url('webFonts/AvertaStdThin/font.woff') format('woff');
+}
+@font-face {
+  font-family: "AvertaStdExtraBoldItalic";
+  src: url('webFonts/AvertaStdExtraBoldItalic/font.woff2') format('woff2'), url('webFonts/AvertaStdExtraBoldItalic/font.woff') format('woff');
+}
+@font-face {
+  font-family: "AvertaStdBoldItalic";
+  src: url('webFonts/AvertaStdBoldItalic/font.woff2') format('woff2'), url('webFonts/AvertaStdBoldItalic/font.woff') format('woff');
+}
+@font-face {
+  font-family: "AvertaStdItalic";
+  src: url('webFonts/AvertaStdItalic/font.woff2') format('woff2'), url('webFonts/AvertaStdItalic/font.woff') format('woff');
+}
+@font-face {
+  font-family: "AvertaStdLightItalic";
+  src: url('webFonts/AvertaStdLightItalic/font.woff2') format('woff2'), url('webFonts/AvertaStdLightItalic/font.woff') format('woff');
+}
+@font-face {
+  font-family: "AvertaStdBlackItalic";
+  src: url('webFonts/AvertaStdBlackItalic/font.woff2') format('woff2'), url('webFonts/AvertaStdBlackItalic/font.woff') format('woff');
+}
+@font-face {
+  font-family: "AvertaStdRegular";
+  src: url('webFonts/AvertaStdRegular/font.woff2') format('woff2'), url('webFonts/AvertaStdRegular/font.woff') format('woff');
+}
+@font-face {
+  font-family: "AvertaStdThinItalic";
+  src: url('webFonts/AvertaStdThinItalic/font.woff2') format('woff2'), url('webFonts/AvertaStdThinItalic/font.woff') format('woff');
+}
+@font-face {
+  font-family: "AvertaStdBold";
+  src: url('webFonts/AvertaStdBold/font.woff2') format('woff2'), url('webFonts/AvertaStdBold/font.woff') format('woff');
+}
+@font-face {
+  font-family: "AvertaStdSemiBoldItalic";
+  src: url('webFonts/AvertaStdSemiBoldItalic/font.woff2') format('woff2'), url('webFonts/AvertaStdSemiBoldItalic/font.woff') format('woff');
+}
+@font-face {
+  font-family: "AvertaStdExtraThinItalic";
+  src: url('webFonts/AvertaStdExtraThinItalic/font.woff2') format('woff2'), url('webFonts/AvertaStdExtraThinItalic/font.woff') format('woff');
+}
+@font-face {
+  font-family: "AvertaStdBlack";
+  src: url('webFonts/AvertaStdBlack/font.woff2') format('woff2'), url('webFonts/AvertaStdBlack/font.woff') format('woff');
+}
+@font-face {
+  font-family: "AvertaStdExtraBold";
+  src: url('webFonts/AvertaStdExtraBold/font.woff2') format('woff2'), url('webFonts/AvertaStdExtraBold/font.woff') format('woff');
+}
+@font-face {
+  font-family: "AvertaStdExtraThin";
+  src: url('webFonts/AvertaStdExtraThin/font.woff2') format('woff2'), url('webFonts/AvertaStdExtraThin/font.woff') format('woff');
+}
+@font-face {
+  font-family: "AvertaStdSemiBold";
+  src: url('webFonts/AvertaStdSemiBold/font.woff2') format('woff2'), url('webFonts/AvertaStdSemiBold/font.woff') format('woff');
+}
+@font-face {
+  font-family: "AvertaStdLight";
+  src: url('webFonts/AvertaStdLight/font.woff2') format('woff2'), url('webFonts/AvertaStdLight/font.woff') format('woff');
+}
+

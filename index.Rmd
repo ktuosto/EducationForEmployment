@@ -16,12 +16,14 @@ output:
 knitr::opts_chunk$set(echo=FALSE, warning=FALSE, message=FALSE)
 #install.packages("leaflet")
 #install.packages("htmlwidgets")
+#install.packages("spatstat.data")
+#install.packages("spatstat")
 library(leaflet)
 library(htmlwidgets)
 library(sf)
 library(tidyverse)
 library(tmap)
-library(spatstat)
+#library(spatstat)
 library(maptools)
 library(raster)
 library(tidycensus)
@@ -63,12 +65,34 @@ EFE has an Salesforce database that houses all information about the organizatio
 
 ### Data Pre-Processing
 
+Initially, the data exports from Salesforce were pre-processed in the following ways:
+
+* To protect PII, Contact ID, Program Name, Company Name, and Class Name were all anonymized by replacing the actual IDs/Names with new, numerical IDs. Lookup tables were sent to EFE so that they can bring the actual values back in if comapny, program, or class name are significant in the analysis.
+* The applications dataset sometimes contained more than one application per person. Information from previous applications was deemed to be not as important, so only the most recent application was retained, and a new column containing the number of applications each person submitted was added. The application data was then joined to the contact data to create a more complete profile for each program participant.
+* Any individuals who were not present in the Employment Status Check dataset were removed from the contact and pre/post survey datasets.
 
 
 
+### Feature Engineering
 
 
 ```{r}
+
+##Load Data 
+
+
+##Must be authenticated with Google Sheets for this to work. Run line below and enter 0 in console to authenticate account
+#gs4_auth()
+
+Contacts<- read_sheet("https://docs.google.com/spreadsheets/d/1udA2SIU3UEptncprmma8xHe5RZWNm3bpxZUEb56CM5s/edit#gid=1903881109")
+ESC<- read_sheet("https://docs.google.com/spreadsheets/d/1wtymKHb5Fk9BQ6un53HozXUKLIgyTeznHER039z1I5U/edit#gid=1677850102")
+PrePost<- read_sheet("https://docs.google.com/spreadsheets/d/1e8P1YAPRN8xSKMSKA03SSWmdwdckSBErWnXiGIYID6Y/edit#gid=1255946150")
+
+
+
+
+
+
 
 ```
 
