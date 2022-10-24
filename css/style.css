@@ -32,9 +32,14 @@ h2 {
   font-size: 38px !important;
 }
 
-h3,h4,h5{
+h3{
   font-family: "AvertaStdRegular";
   color: #951B0D;
+}
+
+h4,h5{
+  font-family: "AvertaStdRegular";
+  color: #000;
 }
 
 
@@ -53,8 +58,8 @@ a:hover, a:focus {
  #TOC::before {
   content: "";
   display: block;
-  height: 60px;
-  margin: 1em 10px 10px 10px;
+  height: 70px;
+  margin-top:-2px;
   background-image: url('assets/EFE.png');
   background-size: contain;
   background-position: left left !important;

@@ -7,7 +7,7 @@ output:
     toc_float: TRUE
     toc_depth: 3
     toc_collapsed: TRUE
-    css: ["style.css","MyFontsWebfontsKit.css"]
+    css: ["css/style.css","css/MyFontsWebfontsKit.css"]
   pdf_document: default
   word_document: default
 ---
@@ -67,13 +67,16 @@ EFE has an Salesforce database that houses all information about the organizatio
 
 Initially, the data exports from Salesforce were pre-processed in the following ways:
 
-* To protect PII, Contact ID, Program Name, Company Name, and Class Name were all anonymized by replacing the actual IDs/Names with new, numerical IDs. Lookup tables were sent to EFE so that they can bring the actual values back in if comapny, program, or class name are significant in the analysis.
+* To protect PII, Contact ID, Program Name, Company Name, and Class Name were all anonymized by replacing the actual IDs/Names with new, numerical IDs. Lookup tables were sent to EFE so that they can bring the actual values back in if company, program, or class name are significant in the analysis.
 * The applications dataset sometimes contained more than one application per person. Information from previous applications was deemed to be not as important, so only the most recent application was retained, and a new column containing the number of applications each person submitted was added. The application data was then joined to the contact data to create a more complete profile for each program participant.
 * Any individuals who were not present in the Employment Status Check dataset were removed from the contact and pre/post survey datasets.
+
+The preprocessing script [can be viewed on GitHub](https://github.com/DataKind-DC/EducationForEmployment/blob/main/PreProcessing.R) so that the deidentification steps can be reproduced with new data exports.
 
 
 
 ### Feature Engineering
+
 
 
 ```{r}
@@ -88,11 +91,38 @@ Contacts<- read_sheet("https://docs.google.com/spreadsheets/d/1udA2SIU3UEptncprm
 ESC<- read_sheet("https://docs.google.com/spreadsheets/d/1wtymKHb5Fk9BQ6un53HozXUKLIgyTeznHER039z1I5U/edit#gid=1677850102")
 PrePost<- read_sheet("https://docs.google.com/spreadsheets/d/1e8P1YAPRN8xSKMSKA03SSWmdwdckSBErWnXiGIYID6Y/edit#gid=1255946150")
 
-
-
-
-
-
-
 ```
+
+
+#### Job Placement
+
+The contact dataset contains 8 columns that relate to when each participant obtained employment. These can be collapsed into a single column that gives the time it took for the participant to get placed, or that they were not placed or could not be reached. Below, the new composite column is on the right, and the other job placement columns can be removed.
+
+
+#### Job Retention
+
+Job retention at 6 months is the initial outcome variable in the analysis. If the participant can not be reached at 6 months after job placement, they are filtered out. The columns relating to retention at other time periods after placement are not needed ad can be removed.
+
+```{r}
+retentiontime<-6
+```
+
+
+
+#### Employment Status Check Surveys
+
+Since the analysis is initially interested in retention at 6 months, the employment status check data will be filtered to contain only the 6 month surveys, and those survey responses can be joined to the participant contact information retaining a 1:1 relationship.
+
+
+
+### Exploratory Data Analysis
+
+#### Retention Rates by Country
+
+#### Retention Rates by Time of Placement
+
+
+### Modeling
+
+A series of models have been tested to determine whether there are features that are important in whether or not participants retained the job the were placed in after 6 months.
 

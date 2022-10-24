@@ -41,13 +41,41 @@ ContactKey<-ESCJoin%>%
   summarise(n=n())%>%
   dplyr::select(1,2)
 
+ClassKey<-ESCJoin%>%
+  group_by(Class..Class.Name)%>%
+  mutate(ClassID=cur_group_id())%>%
+  group_by(Class..Class.Name,ClassID)%>%
+  summarise(n=n())%>%
+  dplyr::select(1,2)
+
+ProjectKey<-PrePost%>%
+  group_by(Class..Project.Name)%>%
+  mutate(ProjectID=cur_group_id())%>%
+  group_by(Class..Project.Name,ProjectID)%>%
+  summarise(n=n())%>%
+  dplyr::select(1,2)
+
+CompanyKey<-ESCJoin%>%
+  group_by(Current.Company.Name)%>%
+  mutate(ComapnyID=cur_group_id())%>%
+  group_by(Current.Company.Name,ComapnyID)%>%
+  summarise(n=n())%>%
+  dplyr::select(1,2)
+
+
 ##Remove Actual Contact ID from ESC
 ESCFinal<-ESCJoin%>%
   left_join(ContactKey,by="Contact.Case.Safe.ID")%>%
+  left_join(ClassKey,by="Class..Class.Name")%>%
+  left_join(CompanyKey,"Current.Company.Name")%>%
   dplyr::select(-1)%>%
+  dplyr::select(-Class..Class.Name)%>%
+  dplyr::select(-Current.Company.Name)%>%
   dplyr::relocate("ContactID",before=1)
 
 n_distinct(ESCFinal$ContactID)
+
+ESCFinal$Current
 
 
 ## Remove people not in ESC or Apps from Contacts
@@ -64,7 +92,9 @@ PrePostFinal<-PrePost%>%
   semi_join(ESC,by="Contact.Case.Safe.ID")%>%
   semi_join(AppsJoin,by="Contact.Case.Safe.ID")%>%
   left_join(ContactKey,by="Contact.Case.Safe.ID")%>%
-  dplyr::select(-1)%>%
+  left_join(ClassKey,by="Class..Class.Name")%>%
+  left_join(ProjectKey,by="Class..Project.Name")%>%
+  dplyr::select(-1,-3,-5)%>%
   dplyr::relocate("ContactID",before=1)
 
 
@@ -103,7 +133,14 @@ unique(ESCFinal$Contact.Case.Safe.ID)
 ##Write Final Data back to Folder on USB
 
 
-setwd("D:/For Data Dive")
+
+
+
+
+
+
+setwd("C:/Users/rcarder/Documents/")
+
 
 write.csv(ContactsFinal,"Contacts.csv")
 write.csv(PrePostFinal,"PrePost Surveys.csv")
@@ -111,7 +148,10 @@ write.csv(ESCFinal,"Employment Status Checks.csv")
 
 ##Write Lookup Keys
 
-setwd("D:/Lookup Keys")
+#setwd("D:/Lookup Keys")
 write.csv(ContactKey,"ContactKey.csv")
+write.csv(CompanyKey,"CompanyKey.csv")
+write.csv(ProjectKey,"ProjectKey.csv")
+write.csv(ClassKey,"ClassKey.csv")
 
 
