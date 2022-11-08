@@ -21,6 +21,7 @@ knitr::opts_chunk$set(echo=FALSE, warning=FALSE, message=FALSE)
 library(leaflet)
 library(htmlwidgets)
 library(sf)
+library(DT)
 library(tidyverse)
 library(tmap)
 #library(spatstat)
@@ -39,10 +40,15 @@ library(kableExtra)
 library(googlesheets4)
 
 
+## Helper Functions
 percent <- function(x, digits = 1, format = "f", ...) {
   paste0(formatC(100 * x, format = format, digits = digits, ...), "%")
 }
 
+## CSS for tables
+callback <- c(
+  "$('table.dataTable.display tbody tr:odd').css('background-color', 'white');",
+  "$('table.dataTable.display tbody tr:even').css('background-color', 'white');")
 
 ```
 
@@ -87,39 +93,206 @@ The preprocessing script [can be viewed on GitHub](https://github.com/DataKind-D
 ##Must be authenticated with Google Sheets for this to work. Run line below and enter 0 in console to authenticate account
 #gs4_auth()
 
-Contacts<- read_sheet("https://docs.google.com/spreadsheets/d/1udA2SIU3UEptncprmma8xHe5RZWNm3bpxZUEb56CM5s/edit#gid=1903881109")
-ESC<- read_sheet("https://docs.google.com/spreadsheets/d/1wtymKHb5Fk9BQ6un53HozXUKLIgyTeznHER039z1I5U/edit#gid=1677850102")
-PrePost<- read_sheet("https://docs.google.com/spreadsheets/d/1e8P1YAPRN8xSKMSKA03SSWmdwdckSBErWnXiGIYID6Y/edit#gid=1255946150")
+contacts<- read_sheet("https://docs.google.com/spreadsheets/d/19Gh_Xg_S829ZBaWR21lgDYOQvrLEgvD5SpgODErnFvc/edit#gid=1464688449")
+ESC<- read_sheet("https://docs.google.com/spreadsheets/d/1bktEtUoyzKCjxaDOecGWYO6gJAbVBhVwebxCqDf6kVI/edit#gid=467482179")
+PrePost<- read_sheet("https://docs.google.com/spreadsheets/d/1jquvTItoow9NagL9Y6LaqwMHILWnt_MdmrB5dePaeLc/edit#gid=1211254872")
 
 ```
 
 
 #### Job Placement
 
-The contact dataset contains 8 columns that relate to when each participant obtained employment. These can be collapsed into a single column that gives the time it took for the participant to get placed, or that they were not placed or could not be reached. Below, the new composite column is on the right, and the other job placement columns can be removed.
+The contact dataset contains 8 columns that relate to when each participant obtained employment. These can be collapsed into a single column that gives the time it took for the participant to get placed, or that they were not placed or could not be reached. Below, the new composite column is on the right, and the original job placement columns can be removed.
+
+
+
+```{r}
+## Clean the contacts file 
+names(contacts)[28] <- "pl_grad"
+names(contacts)[29] <- "pl_grad_data"
+names(contacts)[30] <- "pl_3"
+names(contacts)[31] <- "pl_3_data"
+names(contacts)[32] <- "pl_6"
+names(contacts)[33] <- "pl_6_data"
+names(contacts)[34] <- "pl_9"
+names(contacts)[35] <- "pl_9_data"
+names(contacts)[36] <- "pl_12"
+names(contacts)[37] <- "pl_12_data"
+
+cols.num <- c(28:37)
+contacts[cols.num] <- sapply(contacts[cols.num],as.numeric)
+
+## Make collapse job placement month column
+
+contacts_raw<-contacts%>%
+  mutate(months_job=ifelse(pl_grad==1,"Placed at Graduation",
+                           ifelse(pl_3==1,"Placed at 3 Months",
+                                  ifelse(pl_6==1,"Placed at 6 Months",
+                                         ifelse(pl_9==1,"Placed at 9 Months",
+                                                ifelse(pl_12==1,"Placed at 12 Months",
+                                                       ifelse(pl_12_data==1&pl_12==0,"Not Placed","Not Reached at 12 Months")
+                                                            )))
+                                  )))%>%
+  mutate(sorting=ifelse(pl_grad==1,1,
+                           ifelse(pl_3==1,2,
+                                  ifelse(pl_6==1,3,
+                                         ifelse(pl_9==1,4,
+                                                ifelse(pl_12==1,5,
+                                                       ifelse(pl_12_data==1&pl_12==0,6,7)
+                                                            )))
+                                  )))%>%
+  mutate(Retention_6_months=ifelse(X6.Month.Job.Retention==1,1,
+                                   ifelse(X6.Month.Job.Retention==0&X6.Month.Post.Placement.Data.Avail.YES==1|(X3.Month.Post.Placement.Data.Avail.YES==1&X3.Month.Job.Retention==0),0,NA)))%>%
+  mutate(`Retention at 6 Months`=ifelse(X6.Month.Job.Retention==1,"Yes",
+          ifelse(X6.Month.Job.Retention==0&X6.Month.Post.Placement.Data.Avail.YES==1|(X3.Month.Post.Placement.Data.Avail.YES==1&X3.Month.Job.Retention==0),"No","Data Not Available")))
+
+
+months_job<-contacts_raw%>%
+  dplyr::select(28:37,107,108)%>%
+  group_by(months_job)%>%
+  filter(row_number()==1)%>%
+  arrange(sorting)%>%
+  dplyr::select(1,3,5,7,9,10)
+
+
+
+
+
+datatable(months_job, rownames = FALSE, options = list(dom="t",pageLength = 1000, paging=FALSE),callback = JS(callback)) 
+
+
+```
+
 
 
 #### Job Retention
 
-Job retention at 6 months is the initial outcome variable in the analysis. If the participant can not be reached at 6 months after job placement, they are filtered out. The columns relating to retention at other time periods after placement are not needed ad can be removed.
+Job retention at 6 months is the initial outcome variable in the analysis. Therefore, if the participant can not be reached at 6 months after job placement, they are filtered out, unless they had already not retained their job at the 3 month employment status check. Of the **`r n_distinct(contacts_raw$ContactID)`** participants in the data, only **`r n_distinct(contacts_raw$ContactID[contacts_raw$X6.Month.Post.Placement.Data.Avail.YES==1|(contacts_raw$X3.Month.Post.Placement.Data.Avail.YES==1&contacts_raw$X3.Month.Job.Retention==0)])`** were able to be reached for the 6 month employment survey, or were already known to have not retained their job at 3 months. This is the set of participants that will be included in the analysis. 
 
+Overall, of the `r n_distinct(contacts_raw$ContactID[contacts_raw$X6.Month.Post.Placement.Data.Avail.YES==1|(contacts_raw$X3.Month.Post.Placement.Data.Avail.YES==1&contacts_raw$X3.Month.Job.Retention==0)])` participants there is data for, **`r percent(n_distinct(contacts_raw$ContactID[contacts_raw$Retention_6_months==1])/(n_distinct(contacts_raw$ContactID[contacts_raw$Retention_6_months==1])+n_distinct(contacts_raw$ContactID[contacts_raw$Retention_6_months==0])))`** had retained employment 6 months after being placed in a job (`r n_distinct(contacts_raw$ContactID[contacts_raw$Retention_6_months==1])` of `r n_distinct(contacts_raw$ContactID[contacts_raw$Retention_6_months==1])+n_distinct(contacts_raw$ContactID[contacts_raw$Retention_6_months==0])`).
 ```{r}
-retentiontime<-6
+retentiontable<-contacts_raw%>%
+  group_by(`Retention at 6 Months`)%>%
+  summarise(Participants=n_distinct(ContactID))
+
+datatable(retentiontable, rownames = FALSE, options = list(dom="t",pageLength = 1000, paging=FALSE),callback = JS(callback)) 
+
+
+
 ```
 
 
 
 #### Employment Status Check Surveys
 
-Since the analysis is initially interested in retention at 6 months, the employment status check data will be filtered to contain only the 6 month surveys, and those survey responses can be joined to the participant contact information retaining a 1:1 relationship.
+The analysis is initially interested in retention at 6 months; therefore the employment status check data will be filtered to contain only the 6 month surveys, and those survey responses can be joined to the participant contact information retaining a 1:1 relationship.
 
 
 
 ### Exploratory Data Analysis
 
+#### Retention Rates by Gender
+
+
+```{r}
+
+country<-contacts_raw%>%
+  filter(!is.na(Retention_6_months))%>%
+  group_by(Gender,`Retention at 6 Months`)%>%
+  summarise(Participants=n_distinct(ContactID))%>%
+  mutate(Percent=percent(Participants/sum(Participants)),
+         Total=sum(Participants))%>%
+  dplyr::select(1,2,4,5)%>%
+  pivot_wider(names_from = `Retention at 6 Months`,values_from = Percent)
+
+
+datatable(country, rownames = FALSE, options = list(dom="t",pageLength = 1000, paging=FALSE),callback = JS(callback)) 
+
+```
+
 #### Retention Rates by Country
 
+
+```{r}
+
+country<-contacts_raw%>%
+  filter(!is.na(Retention_6_months))%>%
+  group_by(`Country of Programming`,`Retention at 6 Months`)%>%
+  summarise(Participants=n_distinct(ContactID))%>%
+  mutate(Percent=percent(Participants/sum(Participants)),
+         Total=sum(Participants))%>%
+  dplyr::select(1,2,4,5)%>%
+  pivot_wider(names_from = `Retention at 6 Months`,values_from = Percent)
+
+
+datatable(country, rownames = FALSE, options = list(dom="t",pageLength = 1000, paging=FALSE),callback = JS(callback)) 
+
+```
+
 #### Retention Rates by Time of Placement
+
+```{r}
+placement<-contacts_raw%>%
+  filter(!is.na(Retention_6_months))%>%
+  group_by(months_job,`Retention at 6 Months`)%>%
+    summarise(Participants=n_distinct(ContactID),
+              Sort=first(sorting))%>%
+  mutate(Percent=percent(Participants/sum(Participants)),
+         Total=sum(Participants))%>%
+  arrange(Sort)%>%
+  dplyr::select(1,2,5,6)%>%
+  pivot_wider(names_from = `Retention at 6 Months`,values_from = Percent)%>%
+  dplyr::rename("Placement Time"=1)
+
+
+datatable(placement, rownames = FALSE, options = list(dom="t",pageLength = 1000, paging=FALSE),callback = JS(callback)) 
+
+```
+
+#### Retention Rates by Position Type
+
+```{r}
+
+participants<-contacts_raw%>%
+  filter(!is.na(Retention_6_months))%>%
+  group_by(Earliest.Job.Placement.Type,`Retention at 6 Months`)%>%
+    summarise(Participants=n_distinct(ContactID))%>%
+  mutate(Percent=percent(Participants/sum(Participants)),
+         Total=sum(Participants))%>%
+  dplyr::select(1,2,4,5)%>%
+  pivot_wider(names_from = `Retention at 6 Months`,values_from = Percent)%>%
+  dplyr::rename("Job Placement Type"=1)
+
+
+datatable(participants, rownames = FALSE, options = list(dom="t",pageLength = 1000, paging=FALSE),callback = JS(callback)) 
+
+```
+
+
+
+
+```{r}
+participants<-contacts_raw%>%
+  filter(!is.na(Retention_6_months))
+
+
+not_retained<-participants%>%
+  filter(`Retention at 6 Months`=="No")
+
+
+
+unique(ESC$Employment.Status.Check.Type)
+
+
+ESC_not_retained<-ESC%>%
+  filter(Employment.Status.Check.Type=="6-Month Post-Placement Status Check")%>%
+  group_by(ContactID)%>%
+  slice(which.max(Survey..Created.Date))
+
+
+```
+
+
 
 
 ### Modeling
