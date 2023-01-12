@@ -7,32 +7,36 @@ output:
     toc_float: TRUE
     toc_depth: 3
     toc_collapsed: TRUE
+
+
     css: ["css/style.css","css/MyFontsWebfontsKit.css"]
   pdf_document: default
   word_document: default
 ---
 
 ```{r setup, include=FALSE}
+
 knitr::opts_chunk$set(echo=FALSE, warning=FALSE, message=FALSE)
 #install.packages("leaflet")
 #install.packages("htmlwidgets")
 #install.packages("spatstat.data")
 #install.packages("spatstat")
-library(leaflet)
-library(htmlwidgets)
+#library(leaflet)
+#library(htmlwidgets)
 library(sf)
 library(DT)
 library(tidyverse)
-library(tmap)
+#library(tmap)
 #library(spatstat)
-library(maptools)
-library(raster)
-library(tidycensus)
-library(sf)
-library(jsonlite)
-library(geojsonio)
+#library(maptools)
+#library(raster)
+#library(tidycensus)
+#library(sf)
+#library(jsonlite)
+#library(geojsonio)
+#install.packages("googlesheets4")
 library(hrbrthemes)
-library(formattable)
+#library(formattable)
 library(scales)
 library(ggrepel)
 library(ggthemes)
@@ -85,7 +89,7 @@ The preprocessing script [can be viewed on GitHub](https://github.com/DataKind-D
 
 
 
-```{r}
+```{r cache=TRUE}
 
 ##Load Data 
 
@@ -171,9 +175,17 @@ Job retention at 6 months is the initial outcome variable in the analysis. There
 
 Overall, of the `r n_distinct(contacts_raw$ContactID[contacts_raw$X6.Month.Post.Placement.Data.Avail.YES==1|(contacts_raw$X3.Month.Post.Placement.Data.Avail.YES==1&contacts_raw$X3.Month.Job.Retention==0)])` participants there is data for, **`r percent(n_distinct(contacts_raw$ContactID[contacts_raw$Retention_6_months==1])/(n_distinct(contacts_raw$ContactID[contacts_raw$Retention_6_months==1])+n_distinct(contacts_raw$ContactID[contacts_raw$Retention_6_months==0])))`** had retained employment 6 months after being placed in a job (`r n_distinct(contacts_raw$ContactID[contacts_raw$Retention_6_months==1])` of `r n_distinct(contacts_raw$ContactID[contacts_raw$Retention_6_months==1])+n_distinct(contacts_raw$ContactID[contacts_raw$Retention_6_months==0])`).
 ```{r}
+contactsFiltered<-contacts_raw%>%
+  filter(as.Date(EFE.Graduation.Date)<=as.Date("2022-04-21"))%>%
+  filter(as.numeric(Number.Days.Until.Job.Placement)>-30|is.na(as.numeric(Number.Days.Until.Job.Placement)))
+
+
 retentiontable<-contacts_raw%>%
+  filter(as.Date(EFE.Graduation.Date)<=as.Date("2022-04-21"))%>%
+  filter(as.numeric(Number.Days.Until.Job.Placement)>-30|is.na(as.numeric(Number.Days.Until.Job.Placement)))%>%
   group_by(`Retention at 6 Months`)%>%
   summarise(Participants=n_distinct(ContactID))
+
 
 datatable(retentiontable, rownames = FALSE, options = list(dom="t",pageLength = 1000, paging=FALSE),callback = JS(callback)) 
 
@@ -191,12 +203,12 @@ The analysis is initially interested in retention at 6 months; therefore the emp
 
 ### Exploratory Data Analysis
 
-#### Retention Rates by Gender
+#### 6 Month Retention Rates by Gender
 
 
 ```{r}
 
-country<-contacts_raw%>%
+gender<-contactsFiltered%>%
   filter(!is.na(Retention_6_months))%>%
   group_by(Gender,`Retention at 6 Months`)%>%
   summarise(Participants=n_distinct(ContactID))%>%
@@ -206,16 +218,16 @@ country<-contacts_raw%>%
   pivot_wider(names_from = `Retention at 6 Months`,values_from = Percent)
 
 
-datatable(country, rownames = FALSE, options = list(dom="t",pageLength = 1000, paging=FALSE),callback = JS(callback)) 
+datatable(gender, rownames = FALSE, options = list(dom="t",pageLength = 1000, paging=FALSE),callback = JS(callback)) 
 
 ```
 
-#### Retention Rates by Country
+#### 6 Month Retention Rates by Country
 
 
 ```{r}
 
-country<-contacts_raw%>%
+country<-contactsFiltered%>%
   filter(!is.na(Retention_6_months))%>%
   group_by(`Country of Programming`,`Retention at 6 Months`)%>%
   summarise(Participants=n_distinct(ContactID))%>%
@@ -229,10 +241,10 @@ datatable(country, rownames = FALSE, options = list(dom="t",pageLength = 1000, p
 
 ```
 
-#### Retention Rates by Time of Placement
+#### 6 Month Retention Rates by Time of Placement
 
 ```{r}
-placement<-contacts_raw%>%
+placement<-contactsFiltered%>%
   filter(!is.na(Retention_6_months))%>%
   group_by(months_job,`Retention at 6 Months`)%>%
     summarise(Participants=n_distinct(ContactID),
@@ -249,11 +261,11 @@ datatable(placement, rownames = FALSE, options = list(dom="t",pageLength = 1000,
 
 ```
 
-#### Retention Rates by Position Type
+#### 6 Month Retention Rates by Position Type
 
 ```{r}
 
-participants<-contacts_raw%>%
+participants<-contactsFiltered%>%
   filter(!is.na(Retention_6_months))%>%
   group_by(Earliest.Job.Placement.Type,`Retention at 6 Months`)%>%
     summarise(Participants=n_distinct(ContactID))%>%
@@ -272,7 +284,7 @@ datatable(participants, rownames = FALSE, options = list(dom="t",pageLength = 10
 
 
 ```{r}
-participants<-contacts_raw%>%
+participants<-contactsFiltered%>%
   filter(!is.na(Retention_6_months))
 
 
@@ -281,7 +293,7 @@ not_retained<-participants%>%
 
 
 
-unique(ESC$Employment.Status.Check.Type)
+#unique(ESC$Employment.Status.Check.Type)
 
 
 ESC_not_retained<-ESC%>%
@@ -297,5 +309,5 @@ ESC_not_retained<-ESC%>%
 
 ### Modeling
 
-A series of models have been tested to determine whether there are features that are important in whether or not participants retained the job the were placed in after 6 months.
+A series of models will be tested to determine whether there are features that are important in whether or not participants retained the job the were placed in after 6 months.
 

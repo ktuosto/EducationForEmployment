@@ -1601,20 +1601,18 @@ color: #d14;
       document.body.style.height = "100%";
       document.documentElement.style.width = "100%";
       document.documentElement.style.height = "100%";
-      if (cel) {
-        cel.style.position = "absolute";
-        var pad = unpackPadding(sizing.padding);
-        cel.style.top = pad.top + "px";
-        cel.style.right = pad.right + "px";
-        cel.style.bottom = pad.bottom + "px";
-        cel.style.left = pad.left + "px";
-        el.style.width = "100%";
-        el.style.height = "100%";
-      }
+      cel.style.position = "absolute";
+      var pad = unpackPadding(sizing.padding);
+      cel.style.top = pad.top + "px";
+      cel.style.right = pad.right + "px";
+      cel.style.bottom = pad.bottom + "px";
+      cel.style.left = pad.left + "px";
+      el.style.width = "100%";
+      el.style.height = "100%";
 
       return {
-        getWidth: function() { return cel.offsetWidth; },
-        getHeight: function() { return cel.offsetHeight; }
+        getWidth: function() { return cel.getBoundingClientRect().width; },
+        getHeight: function() { return cel.getBoundingClientRect().height; }
       };
 
     } else {
@@ -1622,8 +1620,8 @@ color: #d14;
       el.style.height = px(sizing.height);
 
       return {
-        getWidth: function() { return el.offsetWidth; },
-        getHeight: function() { return el.offsetHeight; }
+        getWidth: function() { return cel.getBoundingClientRect().width; },
+        getHeight: function() { return cel.getBoundingClientRect().height; }
       };
     }
   }
@@ -1847,8 +1845,8 @@ color: #d14;
 
           elementData(el, "initialized", true);
           if (bindingDef.initialize) {
-            var result = bindingDef.initialize(el, el.offsetWidth,
-              el.offsetHeight);
+            var rect = el.getBoundingClientRect();
+            var result = bindingDef.initialize(el, rect.width, rect.height);
             elementData(el, "init_result", result);
           }
         }
@@ -1890,29 +1888,30 @@ color: #d14;
       forEach(matches, function(el) {
         var sizeObj = initSizing(el, binding);
 
+        var getSize = function(el) {
+          if (sizeObj) {
+            return {w: sizeObj.getWidth(), h: sizeObj.getHeight()}
+          } else {
+            var rect = el.getBoundingClientRect();
+            return {w: rect.width, h: rect.height}
+          }
+        };
+
         if (hasClass(el, "html-widget-static-bound"))
           return;
         el.className = el.className + " html-widget-static-bound";
 
         var initResult;
         if (binding.initialize) {
-          initResult = binding.initialize(el,
-            sizeObj ? sizeObj.getWidth() : el.offsetWidth,
-            sizeObj ? sizeObj.getHeight() : el.offsetHeight
-          );
+          var size = getSize(el);
+          initResult = binding.initialize(el, size.w, size.h);
           elementData(el, "init_result", initResult);
         }
 
         if (binding.resize) {
-          var lastSize = {
-            w: sizeObj ? sizeObj.getWidth() : el.offsetWidth,
-            h: sizeObj ? sizeObj.getHeight() : el.offsetHeight
-          };
+          var lastSize = getSize(el);
           var resizeHandler = function(e) {
-            var size = {
-              w: sizeObj ? sizeObj.getWidth() : el.offsetWidth,
-              h: sizeObj ? sizeObj.getHeight() : el.offsetHeight
-            };
+            var size = getSize(el);
             if (size.w === 0 && size.h === 0)
               return;
             if (size.w === lastSize.w && size.h === lastSize.h)
@@ -2214,7 +2213,6 @@ color: #d14;
     return result;
   }
 })();
-
 </script>
 <style type="text/css">.dt-crosstalk-fade {
 opacity: 0.2;
@@ -4232,8 +4230,8 @@ column that gives the time it took for the participant to get placed, or
 that they were not placed or could not be reached. Below, the new
 composite column is on the right, and the original job placement columns
 can be removed.</p>
-<div id="htmlwidget-f514fc7013b4d15c541b" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-f514fc7013b4d15c541b">{"x":{"filter":"none","vertical":false,"data":[["Placed at Graduation","Placed at 3 Months","Placed at 6 Months","Placed at 9 Months","Placed at 12 Months","Not Placed","Not Reached at 12 Months"],[1,0,0,0,0,0,0],[1,1,0,0,0,0,0],[1,1,1,0,0,0,0],[1,1,1,1,0,0,0],[1,1,1,1,1,0,0],[1,1,1,1,1,1,0]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>months_job<\/th>\n      <th>pl_grad<\/th>\n      <th>pl_3<\/th>\n      <th>pl_6<\/th>\n      <th>pl_9<\/th>\n      <th>pl_12<\/th>\n      <th>pl_12_data<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","pageLength":1000,"paging":false,"columnDefs":[{"className":"dt-right","targets":[1,2,3,4,5,6]}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[10,25,50,100,1000]},"callback":"function(table) {\n$('table.dataTable.display tbody tr:odd').css('background-color', 'white');\n$('table.dataTable.display tbody tr:even').css('background-color', 'white');\n}"},"evals":["callback"],"jsHooks":[]}</script>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-70d500f4132f37a43443" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-70d500f4132f37a43443">{"x":{"filter":"none","vertical":false,"data":[["Placed at Graduation","Placed at 3 Months","Placed at 6 Months","Placed at 9 Months","Placed at 12 Months","Not Placed","Not Reached at 12 Months"],[1,0,0,0,0,0,0],[1,1,0,0,0,0,0],[1,1,1,0,0,0,0],[1,1,1,1,0,0,0],[1,1,1,1,1,0,0],[1,1,1,1,1,1,0]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>months_job<\/th>\n      <th>pl_grad<\/th>\n      <th>pl_3<\/th>\n      <th>pl_6<\/th>\n      <th>pl_9<\/th>\n      <th>pl_12<\/th>\n      <th>pl_12_data<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","pageLength":1000,"paging":false,"columnDefs":[{"className":"dt-right","targets":[1,2,3,4,5,6]}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[10,25,50,100,1000]},"callback":"function(table) {\n$('table.dataTable.display tbody tr:odd').css('background-color', 'white');\n$('table.dataTable.display tbody tr:even').css('background-color', 'white');\n}"},"evals":["callback"],"jsHooks":[]}</script>
 </div>
 <div id="job-retention" class="section level4">
 <h4>Job Retention</h4>
@@ -4249,8 +4247,8 @@ analysis.</p>
 <p>Overall, of the 3162 participants there is data for,
 <strong>45.2%</strong> had retained employment 6 months after being
 placed in a job (1431 of 3165).</p>
-<div id="htmlwidget-e99c2b54dc6043073c4a" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-e99c2b54dc6043073c4a">{"x":{"filter":"none","vertical":false,"data":[["Data Not Available","No","Yes"],[3961,1733,1430]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>Retention at 6 Months<\/th>\n      <th>Participants<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","pageLength":1000,"paging":false,"columnDefs":[{"className":"dt-right","targets":1}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[10,25,50,100,1000]},"callback":"function(table) {\n$('table.dataTable.display tbody tr:odd').css('background-color', 'white');\n$('table.dataTable.display tbody tr:even').css('background-color', 'white');\n}"},"evals":["callback"],"jsHooks":[]}</script>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-fa5e1ce9201f6af30f05" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-fa5e1ce9201f6af30f05">{"x":{"filter":"none","vertical":false,"data":[["Data Not Available","No","Yes"],[2532,1608,1264]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>Retention at 6 Months<\/th>\n      <th>Participants<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","pageLength":1000,"paging":false,"columnDefs":[{"className":"dt-right","targets":1}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[10,25,50,100,1000]},"callback":"function(table) {\n$('table.dataTable.display tbody tr:odd').css('background-color', 'white');\n$('table.dataTable.display tbody tr:even').css('background-color', 'white');\n}"},"evals":["callback"],"jsHooks":[]}</script>
 </div>
 <div id="employment-status-check-surveys" class="section level4">
 <h4>Employment Status Check Surveys</h4>
@@ -4262,40 +4260,30 @@ the participant contact information retaining a 1:1 relationship.</p>
 </div>
 <div id="exploratory-data-analysis" class="section level3">
 <h3>Exploratory Data Analysis</h3>
-<div id="retention-rates-by-gender" class="section level4">
-<h4>Retention Rates by Gender</h4>
-<div id="htmlwidget-64381a52b4e6df0e62f1" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-64381a52b4e6df0e62f1">{"x":{"filter":"none","vertical":false,"data":[["Female","Male"],[1978,1185],["58.6%","48.4%"],["41.4%","51.6%"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>Gender<\/th>\n      <th>Total<\/th>\n      <th>No<\/th>\n      <th>Yes<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","pageLength":1000,"paging":false,"columnDefs":[{"className":"dt-right","targets":1}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[10,25,50,100,1000]},"callback":"function(table) {\n$('table.dataTable.display tbody tr:odd').css('background-color', 'white');\n$('table.dataTable.display tbody tr:even').css('background-color', 'white');\n}"},"evals":["callback"],"jsHooks":[]}</script>
+<div id="month-retention-rates-by-gender" class="section level4">
+<h4>6 Month Retention Rates by Gender</h4>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-52785f1a646f426cd979" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-52785f1a646f426cd979">{"x":{"filter":"none","vertical":false,"data":[["Female","Male"],[1807,1065],["59.8%","49.5%"],["40.2%","50.5%"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>Gender<\/th>\n      <th>Total<\/th>\n      <th>No<\/th>\n      <th>Yes<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","pageLength":1000,"paging":false,"columnDefs":[{"className":"dt-right","targets":1}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[10,25,50,100,1000]},"callback":"function(table) {\n$('table.dataTable.display tbody tr:odd').css('background-color', 'white');\n$('table.dataTable.display tbody tr:even').css('background-color', 'white');\n}"},"evals":["callback"],"jsHooks":[]}</script>
 </div>
-<div id="retention-rates-by-country" class="section level4">
-<h4>Retention Rates by Country</h4>
-<div id="htmlwidget-34ce3f4faf5fe20847f6" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-34ce3f4faf5fe20847f6">{"x":{"filter":"none","vertical":false,"data":[["Egypt Beneficiary","Jordan Beneficiary","Morocco Beneficiary","Palestine Beneficiary","SaudiArabia Beneficiary","Tunisia Beneficiary","UAE Beneficiary","Yemen Beneficiary"],[182,1128,1193,172,202,251,17,18],["40.1%","67.2%","59.3%","43.6%","26.2%","23.5%","47.1%",null],["59.9%","32.8%","40.7%","56.4%","73.8%","76.5%","52.9%","100.0%"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>Country of Programming<\/th>\n      <th>Total<\/th>\n      <th>No<\/th>\n      <th>Yes<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","pageLength":1000,"paging":false,"columnDefs":[{"className":"dt-right","targets":1}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[10,25,50,100,1000]},"callback":"function(table) {\n$('table.dataTable.display tbody tr:odd').css('background-color', 'white');\n$('table.dataTable.display tbody tr:even').css('background-color', 'white');\n}"},"evals":["callback"],"jsHooks":[]}</script>
+<div id="month-retention-rates-by-country" class="section level4">
+<h4>6 Month Retention Rates by Country</h4>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-e96512413043da2fc866" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-e96512413043da2fc866">{"x":{"filter":"none","vertical":false,"data":[["Egypt Beneficiary","Jordan Beneficiary","Morocco Beneficiary","Palestine Beneficiary","SaudiArabia Beneficiary","Tunisia Beneficiary","UAE Beneficiary","Yemen Beneficiary"],[171,1102,1058,161,202,160,17,1],["40.4%","66.6%","59.3%","46.6%","26.2%","26.2%","47.1%",null],["59.6%","33.4%","40.7%","53.4%","73.8%","73.8%","52.9%","100.0%"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>Country of Programming<\/th>\n      <th>Total<\/th>\n      <th>No<\/th>\n      <th>Yes<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","pageLength":1000,"paging":false,"columnDefs":[{"className":"dt-right","targets":1}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[10,25,50,100,1000]},"callback":"function(table) {\n$('table.dataTable.display tbody tr:odd').css('background-color', 'white');\n$('table.dataTable.display tbody tr:even').css('background-color', 'white');\n}"},"evals":["callback"],"jsHooks":[]}</script>
 </div>
-<div id="retention-rates-by-time-of-placement" class="section level4">
-<h4>Retention Rates by Time of Placement</h4>
-<div id="htmlwidget-eb1fb8d2f70e4fc8e69b" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-eb1fb8d2f70e4fc8e69b">{"x":{"filter":"none","vertical":false,"data":[["Placed at Graduation","Placed at 3 Months","Placed at 6 Months","Placed at 9 Months","Placed at 12 Months"],[1981,898,204,67,13],["50.0%","63.1%","61.8%","62.7%","53.8%"],["50.0%","36.9%","38.2%","37.3%","46.2%"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>Placement Time<\/th>\n      <th>Total<\/th>\n      <th>No<\/th>\n      <th>Yes<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","pageLength":1000,"paging":false,"columnDefs":[{"className":"dt-right","targets":1}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[10,25,50,100,1000]},"callback":"function(table) {\n$('table.dataTable.display tbody tr:odd').css('background-color', 'white');\n$('table.dataTable.display tbody tr:even').css('background-color', 'white');\n}"},"evals":["callback"],"jsHooks":[]}</script>
+<div id="month-retention-rates-by-time-of-placement" class="section level4">
+<h4>6 Month Retention Rates by Time of Placement</h4>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-f3ca263abf65b9fd620b" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-f3ca263abf65b9fd620b">{"x":{"filter":"none","vertical":false,"data":[["Placed at Graduation","Placed at 3 Months","Placed at 6 Months","Placed at 9 Months","Placed at 12 Months"],[1697,891,204,67,13],["51.4%","62.9%","61.8%","62.7%","53.8%"],["48.6%","37.1%","38.2%","37.3%","46.2%"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>Placement Time<\/th>\n      <th>Total<\/th>\n      <th>No<\/th>\n      <th>Yes<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","pageLength":1000,"paging":false,"columnDefs":[{"className":"dt-right","targets":1}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[10,25,50,100,1000]},"callback":"function(table) {\n$('table.dataTable.display tbody tr:odd').css('background-color', 'white');\n$('table.dataTable.display tbody tr:even').css('background-color', 'white');\n}"},"evals":["callback"],"jsHooks":[]}</script>
 </div>
-<div id="retention-rates-by-position-type" class="section level4">
-<h4>Retention Rates by Position Type</h4>
-<div id="htmlwidget-958422a54fae09d52aff" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-958422a54fae09d52aff">{"x":{"filter":"none","vertical":false,"data":[["Full-time","Paid internship","Part-time","Self-Employed/Own Business","Temporary or seasonal","Unpaid internship"],[2366,373,122,146,25,131],["53.3%","70.8%","46.7%","35.6%","56.0%","65.6%"],["46.7%","29.2%","53.3%","64.4%","44.0%","34.4%"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>Job Placement Type<\/th>\n      <th>Total<\/th>\n      <th>No<\/th>\n      <th>Yes<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","pageLength":1000,"paging":false,"columnDefs":[{"className":"dt-right","targets":1}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[10,25,50,100,1000]},"callback":"function(table) {\n$('table.dataTable.display tbody tr:odd').css('background-color', 'white');\n$('table.dataTable.display tbody tr:even').css('background-color', 'white');\n}"},"evals":["callback"],"jsHooks":[]}</script>
-<pre><code>##  [1] &quot;At Grad Placement Status Check&quot;      
-##  [2] NA                                    
-##  [3] &quot;3-Month Placement Status Check&quot;      
-##  [4] &quot;9-Month Post-Placement Status Check&quot; 
-##  [5] &quot;3-Month Post-Placement Status Check&quot; 
-##  [6] &quot;12-Month Post-Placement Status Check&quot;
-##  [7] &quot;6-Month Post-Placement Status Check&quot; 
-##  [8] &quot;6-Month Placement Status Check&quot;      
-##  [9] &quot;9-Month Placement Status Check&quot;      
-## [10] &quot;12-Month Placement Status Check&quot;</code></pre>
+<div id="month-retention-rates-by-position-type" class="section level4">
+<h4>6 Month Retention Rates by Position Type</h4>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-94eea757ad3aec84a57a" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-94eea757ad3aec84a57a">{"x":{"filter":"none","vertical":false,"data":[["Full-time","Paid internship","Part-time","Self-Employed/Own Business","Temporary or seasonal","Unpaid internship"],[2137,354,102,133,23,123],["54.3%","70.1%","53.9%","38.3%","56.5%","65.9%"],["45.7%","29.9%","46.1%","61.7%","43.5%","34.1%"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>Job Placement Type<\/th>\n      <th>Total<\/th>\n      <th>No<\/th>\n      <th>Yes<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t","pageLength":1000,"paging":false,"columnDefs":[{"className":"dt-right","targets":1}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[10,25,50,100,1000]},"callback":"function(table) {\n$('table.dataTable.display tbody tr:odd').css('background-color', 'white');\n$('table.dataTable.display tbody tr:even').css('background-color', 'white');\n}"},"evals":["callback"],"jsHooks":[]}</script>
 </div>
 </div>
 <div id="modeling" class="section level3">
 <h3>Modeling</h3>
-<p>A series of models have been tested to determine whether there are
+<p>A series of models will be tested to determine whether there are
 features that are important in whether or not participants retained the
 job the were placed in after 6 months.</p>
 </div>
