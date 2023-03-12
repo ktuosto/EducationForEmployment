@@ -146,9 +146,9 @@ contacts_raw<-contacts%>%
                                                             )))
                                   )))%>%
   mutate(Retention_6_months=ifelse(X6.Month.Job.Retention==1,1,
-                                   ifelse(X6.Month.Job.Retention==0&X6.Month.Post.Placement.Data.Avail.YES==1|(X3.Month.Post.Placement.Data.Avail.YES==1&X3.Month.Job.Retention==0),0,NA)))%>%
+                                   ifelse(X6.Month.Job.Retention==0&X6.Month.Post.Placement.Data.Avail.YES==1,0,NA)))%>%
   mutate(`Retention at 6 Months`=ifelse(X6.Month.Job.Retention==1,"Yes",
-          ifelse(X6.Month.Job.Retention==0&X6.Month.Post.Placement.Data.Avail.YES==1|(X3.Month.Post.Placement.Data.Avail.YES==1&X3.Month.Job.Retention==0),"No","Data Not Available")))
+          ifelse(X6.Month.Job.Retention==0&X6.Month.Post.Placement.Data.Avail.YES==1,"No","Data Not Available")))
 
 
 months_job<-contacts_raw%>%
@@ -310,4 +310,44 @@ ESC_not_retained<-ESC%>%
 ### Modeling
 
 A series of models will be tested to determine whether there are features that are important in whether or not participants retained the job the were placed in after 6 months.
+
+```{r}
+
+# 
+# contactsFiltered$Number.Days.Until.Job.Placement<-as.numeric(contactsFiltered$Number.Days.Until.Job.Placement)
+# 
+# contactsFiltered$Number.Days.Retained.Job<-as.numeric(contactsFiltered$Number.Days.Retained.Job)
+# 
+# contactsFiltered$Number.Family.Members<-as.numeric(contactsFiltered$Number.Family.Members)
+# 
+# contactsFiltered$X..Of.Days.Continuously.Working<-as.numeric(contactsFiltered$X..Of.Days.Continuously.Working)
+# 
+# contactsFiltered$Number.Family.Members.Working<-as.numeric(contactsFiltered$Number.Family.Members.Working)
+# 
+# contactsFiltered$Number.of.Previous.Jobs<-as.character(contactsFiltered$Number.of.Previous.Jobs)
+# 
+# contactsFiltered$Monthly.Family.Income<-as.numeric(contactsFiltered$Monthly.Family.Income)
+# 
+# contactsFiltered$Job.Tenure.in.Months..Second.<-as.numeric(contactsFiltered$Job.Tenure.in.Months..Second.)
+# 
+# contactsFiltered$Job.Tenure.in.Months..Third.<-as.numeric(contactsFiltered$Job.Tenure.in.Months..Third.)
+# 
+# contactsFiltered$Job.Tenure.in.Months..First.<-as.numeric(contactsFiltered$Job.Tenure.in.Months..First.)
+# 
+# contactsFiltered$First.Previous.Job.Salary<-as.numeric(contactsFiltered$First.Previous.Job.Salary)
+# 
+# contactsFiltered$Second.Previous.Job.Salary<-as.numeric(contactsFiltered$Second.Previous.Job.Salary)
+# 
+# contactsFiltered$Third.Previous.Job.Salary
+# 
+# 
+# contactsFiltered$Third.Previous.Job.Salary<-as.numeric(contactsFiltered$Third.Previous.Job.Salary)
+# 
+# setwd("C:/Users/rcarder/Desktop")
+# write.csv(contactsFiltered,"ContactsProcessed.csv",row.names = FALSE)
+# 
+# 
+
+```
+
 
