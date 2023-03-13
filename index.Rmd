@@ -55,6 +55,16 @@ callback <- c(
   "$('table.dataTable.display tbody tr:odd').css('background-color', 'white');",
   "$('table.dataTable.display tbody tr:even').css('background-color', 'white');")
 
+
+theme_set(theme_void(base_family = "AvertaStd"))
+  
+
+
+
+theme_update(text=element_text(family = "AvertaStdRegular"),
+                  axis.title.x =element_text(family = "AvertaStdSemiBold"),
+                  axis.title.y=element_text(family = "AvertaStdSemiBold"))
+
 ```
 
 
@@ -282,7 +292,7 @@ Confidence<-surveys%>%
   pivot_wider(names_from = Stage,values_from = ConfidenceTotal)%>%
   filter(Pre!="NULL"&Post!="NULL")%>%
   mutate(ConfidenceChange=as.numeric(Post)-as.numeric(Pre),
-         ConfidencePercent=(as.numeric(Post)-as.numeric(Pre))/as.numeric(Pre))%>%
+         ConfidencePercent=formattable::percent(as.numeric(Post)-as.numeric(Pre))/as.numeric(Pre))%>%
   dplyr::rename("ConfidencePre"=3,
                 "ConfidencePost"=2)
 
@@ -295,7 +305,7 @@ Efficacy<-surveys%>%
   pivot_wider(names_from = Stage,values_from = EfficacyTotal)%>%
   filter(Pre!="NULL"&Post!="NULL")%>%
   mutate(EfficacyChange=as.numeric(Post)-as.numeric(Pre),
-         EfficaceyPercent=(as.numeric(Post)-as.numeric(Pre))/as.numeric(Pre))%>%
+         EfficaceyPercent=formattable::percent(as.numeric(Post)-as.numeric(Pre))/as.numeric(Pre))%>%
   dplyr::rename("EfficacyPre"=3,
                 "EfficacyPost"=2)
 
@@ -393,22 +403,32 @@ datatable(participants, rownames = FALSE, options = list(dom="t",pageLength = 10
 
 #### Confidence and Self-Efficacy Scores
 
+The plots below utilize the composite confidence and self-efficacy scores to show overall changes between pre and post surveys.
+
 ```{r}
+
 ggplot(surveys,aes(x=Stage,y=ConfidenceTotal, color=Stage))+
-  geom_boxplot()+
+  geom_violin()+
+  geom_quasirandom(method = "smiley",alpha=.03,cex=4)+
+  coord_flip()+
   scale_x_discrete(limits=c("Pre","Post"))+
   labs(title="Aggregate Confidence Scores",
        subtitle = "Total Scores summed across five confidence questions, pre and post trainig")+
   theme_minimal()+
-  theme(axis.text.x = element_text(angle=45,vjust=1,hjust=1))
+  theme(axis.text.x = element_text(vjust=1,hjust=1))
 
 ggplot(surveys,aes(x=Stage,y=EfficacyTotal, color=Stage))+
-  geom_boxplot()+
+  geom_violin()+
+  geom_quasirandom(method = "smiley",alpha=.03,cex=4)+
   scale_x_discrete(limits=c("Pre","Post"))+
+  coord_flip()+
   labs(title="Aggregate Efficacy Scores",
        subtitle = "Total Scores summed across five self-efficacy questions, pre and post trainig")+
   theme_minimal()+
-  theme(axis.text.x = element_text(angle=45,vjust=1,hjust=1))
+  theme(axis.text.x = element_text(vjust=1,hjust=1),
+        text=element_text(family = "AvertaStdRegular"),
+                  axis.title.x =element_text(family = "AvertaStdSemiBold"),
+                  axis.title.y=element_text(family = "AvertaStdSemiBold"))
   
 ```
 
@@ -430,9 +450,11 @@ mutate(Type="Efficacy")%>%
 
 ggplot(ChangePlot,aes(x=Type,y=`Percent Change`,color=Type))+
         geom_violin()+
-         geom_quasirandom(alpha=.25)+
-  labs(title = "Percent Change")+
-  theme_minimal()
+         geom_quasirandom(method = "smiley",alpha=.03,cex=4)+
+  scale_y_continuous(limits = c(-.5,2),labels=scales::percent)+
+  coord_flip()+
+  theme_minimal()+
+  labs(title = "Percent Change")
 
 
 
