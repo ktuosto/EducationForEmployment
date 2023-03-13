@@ -34,7 +34,7 @@ library(tidyverse)
 #library(sf)
 #library(jsonlite)
 #library(geojsonio)
-#install.packages("googlesheets4")
+#install.packages("ggbeeswarm")
 library(hrbrthemes)
 #library(formattable)
 library(scales)
@@ -42,6 +42,7 @@ library(ggrepel)
 library(ggthemes)
 library(kableExtra)
 library(googlesheets4)
+library(ggbeeswarm)
 
 
 ## Helper Functions
@@ -200,6 +201,113 @@ datatable(retentiontable, rownames = FALSE, options = list(dom="t",pageLength = 
 The analysis is initially interested in retention at 6 months; therefore the employment status check data will be filtered to contain only the 6 month surveys, and those survey responses can be joined to the participant contact information retaining a 1:1 relationship.
 
 
+#### Pre and Post Training Surveys
+
+The pre and post training surveys contain questions around confidence and self-efficacy that EFE is interested in looking into. There are five different questions relating to confidence, with answers on a "not at all confident" to "very confident" scale. These answers are turned into numbers so that a composite index can be created, and so that changes in confidence after participants have been through the training programs can be more easily measured.
+
+```{r}
+
+surveys<-PrePost%>%
+  mutate(ClassID=as.numeric(ClassID))%>%
+  mutate(ConfidenceTeam=ifelse(Confidence.in.Working.on.a.Team=="Not at all confident",1,
+                        ifelse(Confidence.in.Working.on.a.Team=="Unconfident",2,
+                        ifelse(Confidence.in.Working.on.a.Team=="Neutral",3,
+                        ifelse(Confidence.in.Working.on.a.Team=="Confident",4,
+                        ifelse(Confidence.in.Working.on.a.Team=="Very confident",5,NA))))))%>%
+  mutate(ConfidenceCommunication=ifelse(Confidence.in.Communicating.w.Colleague=="Not at all confident",1,
+                        ifelse(Confidence.in.Communicating.w.Colleague=="Unconfident",2,
+                        ifelse(Confidence.in.Communicating.w.Colleague=="Neutral",3,
+                        ifelse(Confidence.in.Communicating.w.Colleague=="Confident",4,
+                        ifelse(Confidence.in.Communicating.w.Colleague=="Very confident",5,NA))))))%>%
+  mutate(ConfidenceResolvingProblems=ifelse(Confidence.in.Resolving.Problems=="Not at all confident",1,
+                        ifelse(Confidence.in.Resolving.Problems=="Unconfident",2,
+                        ifelse(Confidence.in.Resolving.Problems=="Neutral",3,
+                        ifelse(Confidence.in.Resolving.Problems=="Confident",4,
+                        ifelse(Confidence.in.Resolving.Problems=="Very confident",5,NA))))))%>%
+  mutate(ConfidenceJobMatching=ifelse(Confidence.in.Finding.Job.Matching.Back.=="Not at all confident",1,
+                        ifelse(Confidence.in.Finding.Job.Matching.Back.=="Unconfident",2,
+                        ifelse(Confidence.in.Finding.Job.Matching.Back.=="Neutral",3,
+                        ifelse(Confidence.in.Finding.Job.Matching.Back.=="Confident",4,
+                        ifelse(Confidence.in.Finding.Job.Matching.Back.=="Very confident",5,NA))))))%>%
+  mutate(ConfidencePresentingYourself=ifelse(Confidence.in.Presenting.Yourself.to.Em.=="Not at all confident",1,
+                        ifelse(Confidence.in.Presenting.Yourself.to.Em.=="Unconfident",2,
+                        ifelse(Confidence.in.Presenting.Yourself.to.Em.=="Neutral",3,
+                        ifelse(Confidence.in.Presenting.Yourself.to.Em.=="Confident",4,
+                        ifelse(Confidence.in.Presenting.Yourself.to.Em.=="Very confident",5,NA))))))%>%
+  mutate(ConfidenceTotal=ConfidenceCommunication+ConfidenceTeam+ConfidencePresentingYourself+ConfidenceJobMatching+ConfidenceResolvingProblems)%>%
+  mutate(Stage=ifelse(str_detect(Survey..Record.Type,"Post"),"Post","Pre"))%>%
+  mutate(EfficacyOptimistic=ifelse(Optimistic.About.my.Future=="Strongly disagree",1,
+                        ifelse(Optimistic.About.my.Future=="Disagree",2,
+                        ifelse(Optimistic.About.my.Future=="Neutral",3,
+                        ifelse(Optimistic.About.my.Future=="Agree",4,
+                        ifelse(Optimistic.About.my.Future=="Strongly agree",5,NA))))))%>%
+  mutate(EfficacyOvercome=ifelse(Work.Seriously.to.Overcome.Challenge=="Strongly disagree",1,
+                        ifelse(Work.Seriously.to.Overcome.Challenge=="Disagree",2,
+                        ifelse(Work.Seriously.to.Overcome.Challenge=="Neutral",3,
+                        ifelse(Work.Seriously.to.Overcome.Challenge=="Agree",4,
+                        ifelse(Work.Seriously.to.Overcome.Challenge=="Strongly agree",5,NA))))))%>%
+  mutate(EfficacyQualifications=ifelse(Necessary.Qualifications.to.Succeed=="Strongly disagree",1,
+                        ifelse(Necessary.Qualifications.to.Succeed=="Disagree",2,
+                        ifelse(Necessary.Qualifications.to.Succeed=="Neutral",3,
+                        ifelse(Necessary.Qualifications.to.Succeed=="Agree",4,
+                        ifelse(Necessary.Qualifications.to.Succeed=="Strongly agree",5,NA))))))%>%
+  mutate(EfficacyFindaJob=ifelse(Can.Find.a.Job.in.the.Appropriate.Career=="Strongly disagree",1,
+                        ifelse(Can.Find.a.Job.in.the.Appropriate.Career=="Disagree",2,
+                        ifelse(Can.Find.a.Job.in.the.Appropriate.Career=="Neutral",3,
+                        ifelse(Can.Find.a.Job.in.the.Appropriate.Career=="Agree",4,
+                        ifelse(Can.Find.a.Job.in.the.Appropriate.Career=="Strongly agree",5,NA))))))%>%
+  mutate(EfficacyFamiliarRights=ifelse(Familiar.With.Rights.and.Duties=="Strongly disagree",1,
+                        ifelse(Familiar.With.Rights.and.Duties=="Disagree",2,
+                        ifelse(Familiar.With.Rights.and.Duties=="Neutral",3,
+                        ifelse(Familiar.With.Rights.and.Duties=="Agree",4,
+                        ifelse(Familiar.With.Rights.and.Duties=="Strongly agree",5,NA))))))%>%
+  mutate(EfficacyTotal=EfficacyFamiliarRights+EfficacyFindaJob+EfficacyQualifications+EfficacyOvercome+EfficacyOptimistic)
+
+
+surveys<-as.data.frame(lapply(surveys,unlist))
+
+
+
+
+
+  
+
+```
+
+
+
+```{r}
+Confidence<-surveys%>%
+  dplyr::select(2,27,28)%>%
+  pivot_wider(names_from = Stage,values_from = ConfidenceTotal)%>%
+  filter(Pre!="NULL"&Post!="NULL")%>%
+  mutate(ConfidenceChange=as.numeric(Post)-as.numeric(Pre),
+         ConfidencePercent=(as.numeric(Post)-as.numeric(Pre))/as.numeric(Pre))%>%
+  dplyr::rename("ConfidencePre"=3,
+                "ConfidencePost"=2)
+
+
+Confidence<-as.data.frame(lapply(Confidence,unlist))
+
+
+Efficacy<-surveys%>%
+  dplyr::select(2,34,28)%>%
+  pivot_wider(names_from = Stage,values_from = EfficacyTotal)%>%
+  filter(Pre!="NULL"&Post!="NULL")%>%
+  mutate(EfficacyChange=as.numeric(Post)-as.numeric(Pre),
+         EfficaceyPercent=(as.numeric(Post)-as.numeric(Pre))/as.numeric(Pre))%>%
+  dplyr::rename("EfficacyPre"=3,
+                "EfficacyPost"=2)
+
+Efficacy<-as.data.frame(lapply(Efficacy,unlist))
+# boxplots<-surveys%>%
+#   dplyr::select()
+#   pivot_longer(22:26,names_to = "Question",values_to = "Confidence")
+
+
+
+```
+
 
 ### Exploratory Data Analysis
 
@@ -283,7 +391,59 @@ datatable(participants, rownames = FALSE, options = list(dom="t",pageLength = 10
 
 
 
+#### Confidence and Self-Efficacy Scores
+
 ```{r}
+ggplot(surveys,aes(x=Stage,y=ConfidenceTotal, color=Stage))+
+  geom_boxplot()+
+  scale_x_discrete(limits=c("Pre","Post"))+
+  labs(title="Aggregate Confidence Scores",
+       subtitle = "Total Scores summed across five confidence questions, pre and post trainig")+
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle=45,vjust=1,hjust=1))
+
+ggplot(surveys,aes(x=Stage,y=EfficacyTotal, color=Stage))+
+  geom_boxplot()+
+  scale_x_discrete(limits=c("Pre","Post"))+
+  labs(title="Aggregate Efficacy Scores",
+       subtitle = "Total Scores summed across five self-efficacy questions, pre and post trainig")+
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle=45,vjust=1,hjust=1))
+  
+```
+
+
+
+
+```{r}
+
+ConfidencePlot<-Confidence%>%
+  dplyr::select(5)%>%
+  dplyr::rename("Percent Change"=1)%>%
+mutate(Type="Confidence")
+
+ChangePlot<-Efficacy%>%
+  dplyr::select(5)%>%
+  dplyr::rename("Percent Change"=1)%>%
+mutate(Type="Efficacy")%>%
+  bind_rows(ConfidencePlot)
+
+ggplot(ChangePlot,aes(x=Type,y=`Percent Change`,color=Type))+
+        geom_violin()+
+         geom_quasirandom(alpha=.25)+
+  labs(title = "Percent Change")+
+  theme_minimal()
+
+
+
+```
+
+
+
+
+```{r}
+
+##Starting to try and joj correct ESCs
 participants<-contactsFiltered%>%
   filter(!is.na(Retention_6_months))
 
@@ -291,10 +451,7 @@ participants<-contactsFiltered%>%
 not_retained<-participants%>%
   filter(`Retention at 6 Months`=="No")
 
-
-
 #unique(ESC$Employment.Status.Check.Type)
-
 
 ESC_not_retained<-ESC%>%
   filter(Employment.Status.Check.Type=="6-Month Post-Placement Status Check")%>%
@@ -303,8 +460,6 @@ ESC_not_retained<-ESC%>%
 
 
 ```
-
-
 
 
 ### Modeling
