@@ -22,12 +22,12 @@ retention_groups <- c("pl_grad", "pl_3", "pl_6", "pl_9", "pl_12")
 
 # create mean by country by months of retention every time
 calculate_mean <- function(df) {
-  for (group in retention_groups) {
+ # for (group in retention_groups) {
   df %>%
-    group_by(Country.of.Programming, group) %>%
-    summarize_at(vars(cols), mean, na.rm = TRUE)
+    group_by(Country.of.Programming) %>%
+    summarize_at(vars(groups), mean, na.rm = TRUE)
   
-  }
+  #}
 }
 
 calculate_mean(df)
