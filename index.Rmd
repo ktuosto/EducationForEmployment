@@ -394,6 +394,13 @@ The retention rates for participants that have data at each time interval is sho
 
 ```{r}
 
+genderTotals<-contactsFiltered%>%
+  dplyr::select(ContactID, Gender,109,111,113,115)%>%
+  pivot_longer(3:6,names_to = "TimeScale",values_to = "Retained")%>%
+  filter(!is.na(Retained))%>%
+  group_by(Gender)%>%
+  summarise(Total=n_distinct(ContactID))
+
 genderAll<-contactsFiltered%>%
   dplyr::select(ContactID, Gender,109,111,113,115)%>%
   pivot_longer(3:6,names_to = "TimeScale",values_to = "Retained")%>%
@@ -405,7 +412,8 @@ genderAll<-contactsFiltered%>%
   arrange(TimeScale)%>%
   dplyr::select(1,2,5)%>%
   pivot_wider(names_from = TimeScale,values_from = Percent)%>%
-  dplyr::relocate(2,.after = 5)
+  dplyr::relocate(2,.after = 5)%>%
+  left_join(genderTotals)
 
 datatable(genderAll, rownames = FALSE, options = list(dom="t",pageLength = 1000, paging=FALSE),callback = JS(callback)) 
 
@@ -420,6 +428,13 @@ The retention rates for participants that have data at each time interval is sho
 
 ```{r}
 
+countryTotals<-contactsFiltered%>%
+  dplyr::select(ContactID, `Country of Programming`,109,111,113,115)%>%
+  pivot_longer(3:6,names_to = "TimeScale",values_to = "Retained")%>%
+  filter(!is.na(Retained))%>%
+  group_by(`Country of Programming`)%>%
+  summarise(Total=n_distinct(ContactID))
+
 country<-contactsFiltered%>%
   dplyr::select(ContactID, `Country of Programming`,109,111,113,115)%>%
   pivot_longer(3:6,names_to = "TimeScale",values_to = "Retained")%>%
@@ -431,7 +446,8 @@ country<-contactsFiltered%>%
   arrange(TimeScale)%>%
   dplyr::select(1,2,5)%>%
   pivot_wider(names_from = TimeScale,values_from = Percent)%>%
-  dplyr::relocate(2,.after = 5)
+  dplyr::relocate(2,.after = 5)%>%
+  left_join(countryTotals)
 
 # country<-contactsFiltered%>%
 #   filter(!is.na(Retention_6_months))%>%
@@ -454,6 +470,14 @@ The retention rates for participants that have data at each time interval is sho
 
 ```{r}
 
+
+placementTotals<-contactsFiltered%>%
+  dplyr::select(ContactID, months_job,109,111,113,115)%>%
+  pivot_longer(3:6,names_to = "TimeScale",values_to = "Retained")%>%
+  filter(!is.na(Retained))%>%
+  group_by(months_job)%>%
+  summarise(Total=n_distinct(ContactID))
+
 placement<-contactsFiltered%>%
   dplyr::select(ContactID, months_job,109,111,113,115)%>%
   pivot_longer(3:6,names_to = "TimeScale",values_to = "Retained")%>%
@@ -466,6 +490,7 @@ placement<-contactsFiltered%>%
   dplyr::select(1,2,5)%>%
   pivot_wider(names_from = TimeScale,values_from = Percent)%>%
   dplyr::relocate(2,.after = 5)%>%
+  left_join(placementTotals)%>%
   dplyr::rename("Placement Time"=1)
 
 # placement<-contactsFiltered%>%
@@ -545,14 +570,37 @@ ggplot(ChangePlot,aes(x=Type,y=`Percent Change`,color=Type))+
 
 
 ```
-##### Do the confidence and self-eficacy scores correlate with retention
 
+##### Do the confidence and self-eficacy scores correlate with retention?
 
+There are actually slight negative correlations between increases in confidence and efficacy scores and retention rates:
 
 ```{r}
 
+# confcor <- cor.test(contactsWithTarget$ConfidenceChange, contactsWithTarget$Retention_6_months, 
+#                     method = "pearson")
+# 
+# effcor <- cor.test(contactsWithTarget$EfficacyChange, contactsWithTarget$Retention_6_months, 
+#                     method = "pearson")
+
+
+cor.test(contactsWithTarget$EfficacyChange, contactsWithTarget$Retention_6_months, 
+                    method = "pearson")
+
 ggplot(contactsWithTarget)+
-  geom_point(aes(x=EfficacyPercent,y=ConfidencePercent,color=`Retention at 6 Months`))+
+  geom_bar(aes(x=EfficacyChange,group=`Retention at 6 Months`,color=`Retention at 6 Months`,
+               fill=`Retention at 6 Months`),position="fill")+
+    ggtitle("Retention Rates at 6 Months by Change in Efficacy Score")+
+  theme_minimal()
+
+
+cor.test(contactsWithTarget$ConfidenceChange, contactsWithTarget$Retention_6_months, 
+                    method = "pearson")
+
+ggplot(contactsWithTarget)+
+  geom_bar(aes(x=ConfidenceChange,group=`Retention at 6 Months`,color=`Retention at 6 Months`,
+               fill=`Retention at 6 Months`),position="fill")+
+  ggtitle("Retention Rates at 6 Months by Change in Confidence Score")+
   theme_minimal()
 
 
