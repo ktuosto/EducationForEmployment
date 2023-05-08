@@ -42,6 +42,7 @@ library(ggrepel)
 library(ggthemes)
 library(kableExtra)
 library(googlesheets4)
+library(reactable)
 library(ggbeeswarm)
 
 
@@ -111,6 +112,11 @@ The preprocessing script [can be viewed on GitHub](https://github.com/DataKind-D
 contacts<- read_sheet("https://docs.google.com/spreadsheets/d/19Gh_Xg_S829ZBaWR21lgDYOQvrLEgvD5SpgODErnFvc/edit#gid=1464688449")
 ESC<- read_sheet("https://docs.google.com/spreadsheets/d/1bktEtUoyzKCjxaDOecGWYO6gJAbVBhVwebxCqDf6kVI/edit#gid=467482179")
 PrePost<- read_sheet("https://docs.google.com/spreadsheets/d/1jquvTItoow9NagL9Y6LaqwMHILWnt_MdmrB5dePaeLc/edit#gid=1211254872")
+
+
+
+
+#contacts<-as.data.frame(lapply(contacts,unlist))
 
 ```
 
@@ -330,10 +336,29 @@ Efficacy<-surveys%>%
 Efficacy<-as.data.frame(lapply(Efficacy,unlist))
 
 
+MostSignificantChange<-surveys%>%
+  filter(Stage=="Post")%>%
+  dplyr::select(2,17,18,19)
+
+
 
 contactsProcessed<-contactsFiltered%>%
    left_join(Confidence,by="ContactID")%>%
-   left_join(Efficacy,by="ContactID")
+   left_join(Efficacy,by="ContactID")%>%
+   left_join(MostSignificantChange,by="ContactID")
+
+
+contactsWithTarget<-contactsProcessed%>%
+  filter(!is.na(Retention_6_months))
+
+contactswithEfficacy<-contactsWithTarget%>%
+   filter(!is.na(EfficacyPercent))
+
+contactswithConfidence<-contactsWithTarget%>%
+   filter(!is.na(ConfidencePercent))
+
+contactswithChange<-contactsWithTarget%>%
+   filter(!is.na(First.Change))
 
 #contactsProcessed<-as.data.frame(lapply(contactsProcessed,unlist))
 
@@ -500,26 +525,109 @@ ggplot(ChangePlot,aes(x=Type,y=`Percent Change`,color=Type))+
 
 
 ```
-
+##### Do the confidence and self-eficacy scores correlate with retention
 
 
 
 ```{r}
 
-##Starting to try and joj correct ESCs
-participants<-contactsFiltered%>%
+ggplot(contactsWithTarget)+
+  geom_point(aes(x=EfficacyPercent,y=ConfidencePercent,color=`Retention at 6 Months`))+
+  theme_minimal()
+
+
+
+```
+
+#### Participants who lost their job
+
+A categorical variable was calculated to identify those who had a job at one point, and then lost it. This was calculated by looking at each of the four time intervals (3 months, 6 months, 9 months, and 12 months), and taking all participants with a retention at that stage of "NO," who also had a placement at any of the preceding time intervals.
+
+
+```{r}
+
+##Starting to try and join correct ESCs
+contactsProcessedwithESCH<-contactsProcessed%>%
   filter(!is.na(Retention_6_months))
 
+Lost_job<-contactsProcessedwithESCH%>%
+  filter((`Retention at 3 Months`=="No"&(pl_grad==1))|
+    (`Retention at 6 Months`=="No"&(pl_grad==1|pl_3==1))|
+    (`Retention at 9 Months`=="No"&(pl_grad==1|pl_3==1||pl_6==1))|
+    (`Retention at 12 Months`=="No"&(pl_grad==1|pl_3==1|pl_6==1|pl_9==1)))
 
-not_retained<-participants%>%
-  filter(`Retention at 6 Months`=="No")
+Lost_job_contacts<-unique(Lost_job$ContactID)
+
+
+Lost_job_ESC<-ESC%>%
+  filter(ContactID%in%Lost_job_contacts)%>%
+  filter(Employment.Status.Check.Type=="3-Month Post-Placement Status Check"|Employment.Status.Check.Type=="6-Month Post-Placement Status Check"|Employment.Status.Check.Type=="9-Month Post-Placement Status Check"|Employment.Status.Check.Type=="12-Month Post-Placement Status Check")
+
+
+ReasonsForLeaving<-Lost_job_ESC%>%
+  dplyr::select(ContactID,Employment.Status.Check.Type,First.Reason.Left.Last.Job)%>%
+  pivot_wider(names_from = Employment.Status.Check.Type,values_from = First.Reason.Left.Last.Job)%>%
+  mutate(`3-Month Post-Placement Status Check`=ifelse(`3-Month Post-Placement Status Check`=="NULL",NA,`3-Month Post-Placement Status Check`),
+         `6-Month Post-Placement Status Check`=ifelse(`6-Month Post-Placement Status Check`=="NULL",NA,`6-Month Post-Placement Status Check`),
+         `9-Month Post-Placement Status Check`=ifelse(`9-Month Post-Placement Status Check`=="NULL",NA,`9-Month Post-Placement Status Check`),
+         `12-Month Post-Placement Status Check`=ifelse(`12-Month Post-Placement Status Check`=="NULL",NA,`12-Month Post-Placement Status Check`))%>%
+  mutate(ReasonsforLeaving=ifelse(!is.na(`12-Month Post-Placement Status Check`),`12-Month Post-Placement Status Check`, 
+                                 ifelse(!is.na(`9-Month Post-Placement Status Check`),`9-Month Post-Placement Status Check`,
+                                        ifelse(!is.na(`6-Month Post-Placement Status Check`),`6-Month Post-Placement Status Check`,`3-Month Post-Placement Status Check`))))%>%
+    mutate(ReasonsforLeaving=ifelse(str_detect(ReasonsforLeaving,"Position was temporary"),"Position was temporary",
+                                    ifelse(str_detect(ReasonsforLeaving,"Benefits"),"Benefits",
+                                           ifelse(str_detect(ReasonsforLeaving,"Salary"),"Salary",
+                                                  ifelse(str_detect(ReasonsforLeaving,"Job not sufficiently prestigious"),"Job not sufficiently prestigious",
+                                                         ifelse(str_detect(ReasonsforLeaving,"Focused on studyings"),"Focused on studying",
+                                                                ifelse(str_detect(ReasonsforLeaving,"Wants to start own business"),"Wants to start own business",
+                                                                       ifelse(str_detect(ReasonsforLeaving,"Dismissed from job"),"Dismissed from job",
+                                                                              ifelse(str_detect(ReasonsforLeaving,"Job not matched with educatio"),"Job not matched with education",
+                                                                                     ifelse(str_detect(ReasonsforLeaving,"Job too far from home"),"Job too far from home",
+                                                                                            ifelse(str_detect(ReasonsforLeaving,"Position not appropriate"),"Position not appropriate",
+                                                                                                    ifelse(str_detect(ReasonsforLeaving,"Other"),"Other",
+                                                                                                            ifelse(str_detect(ReasonsforLeaving,"NA"),"NA",ReasonsforLeaving)))))))))))))
+                                                                                                
+Reasons<-unique(ReasonsForLeaving$ReasonsforLeaving)
+
 
 #unique(ESC$Employment.Status.Check.Type)
+# 
+# ESC_not_retained<-ESC%>%
+#   filter(Employment.Status.Check.Type=="6-Month Post-Placement Status Check")%>%
+#   group_by(ContactID)%>%
+#   slice(which.max(Survey..Created.Date))
 
-ESC_not_retained<-ESC%>%
-  filter(Employment.Status.Check.Type=="6-Month Post-Placement Status Check")%>%
-  group_by(ContactID)%>%
-  slice(which.max(Survey..Created.Date))
+
+```
+
+##### Reasons for Leaving
+
+Using the categorization calculated above for who lost their jobs at any point, the resons for leaving were looked at. Of `r n_distinct(Lost_job_ESC$ContactID)` participants who met this criteria, `r n_distinct(ReasonsForLeaving$ContactID[!is.na(ReasonsForLeaving$ReasonforLeaving)])` particpants had at least one answer in an employment status check survey where they gave a reason for leaving their first job. If there were answers given in multiple employment status checks, the most recent answer was used. A sample of how this was done is below, where "ReasonsforLeaving" is the combined field using the most recent response. Responses were also cleaned to remove stray commas and nested answers.
+
+
+
+```{r}
+ConfidenceTable<-ReasonsForLeaving%>%
+  head(10)
+
+
+datatable(ConfidenceTable, rownames = FALSE, options = list(dom="t",pageLength = 1000, paging=FALSE),callback = JS(callback)) 
+```
+The frequency of reasons given for leaving the first job is below, with NA and Other being the most frequent, and "Position is Temporary" and "Salary" being the top non-other responses for participants where there is data.
+
+```{r}
+test<-ReasonsForLeaving%>%
+  unnest(ReasonsforLeaving)%>%
+  group_by(ReasonsforLeaving)%>%
+  add_count()%>%
+  ungroup()%>%
+  mutate(ReasonsforLeaving = fct_reorder(ReasonsforLeaving, n, .desc = FALSE))
+
+
+ggplot(test, aes(x=ReasonsforLeaving))+
+  coord_flip()+
+  geom_text(stat='count', aes(label=..count..), hjust=-.5, size=2.5)+
+  geom_bar(fill="#951B0D")+theme_minimal()
 
 
 ```
