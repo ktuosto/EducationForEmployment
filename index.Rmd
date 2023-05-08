@@ -387,83 +387,103 @@ datatable(EfficacyTable, rownames = FALSE, options = list(dom="t",pageLength = 1
 
 ### Exploratory Data Analysis
 
-#### 6 Month Retention Rates by Gender
+#### Retention Rates by Gender
+
+The retention rates for participants that have data at each time interval is shown below:
 
 
 ```{r}
 
-gender<-contactsFiltered%>%
-  filter(!is.na(Retention_6_months))%>%
-  group_by(Gender,`Retention at 6 Months`)%>%
-  summarise(Participants=n_distinct(ContactID))%>%
-  mutate(Percent=percent(Participants/sum(Participants)),
-         Total=sum(Participants))%>%
-  dplyr::select(1,2,4,5)%>%
-  pivot_wider(names_from = `Retention at 6 Months`,values_from = Percent)
+genderAll<-contactsFiltered%>%
+  dplyr::select(ContactID, Gender,109,111,113,115)%>%
+  pivot_longer(3:6,names_to = "TimeScale",values_to = "Retained")%>%
+  filter(!is.na(Retained))%>%
+  group_by(Gender, TimeScale)%>%
+  summarise(Retained=sum(Retained),
+            Total=n_distinct(ContactID))%>%
+  mutate(Percent=percent(Retained/Total))%>%
+  arrange(TimeScale)%>%
+  dplyr::select(1,2,5)%>%
+  pivot_wider(names_from = TimeScale,values_from = Percent)%>%
+  dplyr::relocate(2,.after = 5)
 
+datatable(genderAll, rownames = FALSE, options = list(dom="t",pageLength = 1000, paging=FALSE),callback = JS(callback)) 
 
-datatable(gender, rownames = FALSE, options = list(dom="t",pageLength = 1000, paging=FALSE),callback = JS(callback)) 
 
 ```
 
-#### 6 Month Retention Rates by Country
+#### Retention Rates by Country
+
+The retention rates for participants that have data at each time interval is shown below:
+
 
 
 ```{r}
 
 country<-contactsFiltered%>%
-  filter(!is.na(Retention_6_months))%>%
-  group_by(`Country of Programming`,`Retention at 6 Months`)%>%
-  summarise(Participants=n_distinct(ContactID))%>%
-  mutate(Percent=percent(Participants/sum(Participants)),
-         Total=sum(Participants))%>%
-  dplyr::select(1,2,4,5)%>%
-  pivot_wider(names_from = `Retention at 6 Months`,values_from = Percent)
+  dplyr::select(ContactID, `Country of Programming`,109,111,113,115)%>%
+  pivot_longer(3:6,names_to = "TimeScale",values_to = "Retained")%>%
+  filter(!is.na(Retained))%>%
+  group_by(`Country of Programming`, TimeScale)%>%
+  summarise(Retained=sum(Retained),
+            Total=n_distinct(ContactID))%>%
+  mutate(Percent=percent(Retained/Total))%>%
+  arrange(TimeScale)%>%
+  dplyr::select(1,2,5)%>%
+  pivot_wider(names_from = TimeScale,values_from = Percent)%>%
+  dplyr::relocate(2,.after = 5)
+
+# country<-contactsFiltered%>%
+#   filter(!is.na(Retention_6_months))%>%
+#   group_by(`Country of Programming`,`Retention at 6 Months`)%>%
+#   summarise(Participants=n_distinct(ContactID))%>%
+#   mutate(Percent=percent(Participants/sum(Participants)),
+#          Total=sum(Participants))%>%
+#   dplyr::select(1,2,4,5)%>%
+#   pivot_wider(names_from = `Retention at 6 Months`,values_from = Percent)
 
 
 datatable(country, rownames = FALSE, options = list(dom="t",pageLength = 1000, paging=FALSE),callback = JS(callback)) 
 
 ```
 
-#### 6 Month Retention Rates by Time of Placement
+#### Retention Rates by Time of Job Placement
+
+The retention rates for participants that have data at each time interval is shown below:
+
 
 ```{r}
+
 placement<-contactsFiltered%>%
-  filter(!is.na(Retention_6_months))%>%
-  group_by(months_job,`Retention at 6 Months`)%>%
-    summarise(Participants=n_distinct(ContactID),
-              Sort=first(sorting))%>%
-  mutate(Percent=percent(Participants/sum(Participants)),
-         Total=sum(Participants))%>%
-  arrange(Sort)%>%
-  dplyr::select(1,2,5,6)%>%
-  pivot_wider(names_from = `Retention at 6 Months`,values_from = Percent)%>%
+  dplyr::select(ContactID, months_job,109,111,113,115)%>%
+  pivot_longer(3:6,names_to = "TimeScale",values_to = "Retained")%>%
+  filter(!is.na(Retained))%>%
+  group_by(months_job, TimeScale)%>%
+  summarise(Retained=sum(Retained),
+            Total=n_distinct(ContactID))%>%
+  mutate(Percent=percent(Retained/Total))%>%
+  arrange(TimeScale)%>%
+  dplyr::select(1,2,5)%>%
+  pivot_wider(names_from = TimeScale,values_from = Percent)%>%
+  dplyr::relocate(2,.after = 5)%>%
   dplyr::rename("Placement Time"=1)
+
+# placement<-contactsFiltered%>%
+#   filter(!is.na(Retention_6_months))%>%
+#   group_by(months_job,`Retention at 6 Months`)%>%
+#     summarise(Participants=n_distinct(ContactID),
+#               Sort=first(sorting))%>%
+#   mutate(Percent=percent(Participants/sum(Participants)),
+#          Total=sum(Participants))%>%
+#   arrange(Sort)%>%
+#   dplyr::select(1,2,5,6)%>%
+#   pivot_wider(names_from = `Retention at 6 Months`,values_from = Percent)%>%
+#   dplyr::rename("Placement Time"=1)
 
 
 datatable(placement, rownames = FALSE, options = list(dom="t",pageLength = 1000, paging=FALSE),callback = JS(callback)) 
 
 ```
-
-#### 6 Month Retention Rates by Position Type
-
-```{r}
-
-participants<-contactsFiltered%>%
-  filter(!is.na(Retention_6_months))%>%
-  group_by(Earliest.Job.Placement.Type,`Retention at 6 Months`)%>%
-    summarise(Participants=n_distinct(ContactID))%>%
-  mutate(Percent=percent(Participants/sum(Participants)),
-         Total=sum(Participants))%>%
-  dplyr::select(1,2,4,5)%>%
-  pivot_wider(names_from = `Retention at 6 Months`,values_from = Percent)%>%
-  dplyr::rename("Job Placement Type"=1)
-
-
-datatable(participants, rownames = FALSE, options = list(dom="t",pageLength = 1000, paging=FALSE),callback = JS(callback)) 
-
-```
-
 
 
 
@@ -616,15 +636,76 @@ datatable(ConfidenceTable, rownames = FALSE, options = list(dom="t",pageLength =
 The frequency of reasons given for leaving the first job is below, with NA and Other being the most frequent, and "Position is Temporary" and "Salary" being the top non-other responses for participants where there is data.
 
 ```{r}
-test<-ReasonsForLeaving%>%
+ReasonsForLeaving<-ReasonsForLeaving%>%
   unnest(ReasonsforLeaving)%>%
   group_by(ReasonsforLeaving)%>%
   add_count()%>%
   ungroup()%>%
-  mutate(ReasonsforLeaving = fct_reorder(ReasonsforLeaving, n, .desc = FALSE))
+  mutate(ReasonsforLeaving = fct_reorder(ReasonsforLeaving, n, .desc = FALSE))%>%
+  dplyr::select(1,6)
+
+#n_distinct(ReasonsForLeaving$ContactID)-n_distinct(ReasonsForLeaving$ContactID[ReasonsForLeaving$ReasonsforLeaving=="NA"])
 
 
-ggplot(test, aes(x=ReasonsforLeaving))+
+## Join in reasons
+contactsProcessedReasons<-contactsProcessed%>%
+  left_join(ReasonsForLeaving,by="ContactID")
+
+ggplot(ReasonsForLeaving, aes(x=ReasonsforLeaving))+
+  coord_flip()+
+  geom_text(stat='count', aes(label=..count..), hjust=-.5, size=2.5)+
+  geom_bar(fill="#951B0D")+theme_minimal()
+
+
+
+
+
+
+```
+
+
+##### Job types for those who retained job at least 6 months
+
+```{r}
+
+
+participants<-contactsFiltered%>%
+  filter(!is.na(Retention_6_months))%>%
+  group_by(Earliest.Job.Placement.Type,`Retention at 6 Months`)%>%
+    summarise(Participants=n_distinct(ContactID))%>%
+  mutate(Percent=percent(Participants/sum(Participants)),
+         Total=sum(Participants))%>%
+  dplyr::select(1,2,4,5)%>%
+  pivot_wider(names_from = `Retention at 6 Months`,values_from = Percent)%>%
+  dplyr::rename("Job Placement Type"=1)
+
+
+participantsCount<-contactsFiltered%>%
+  filter(!is.na(Retention_6_months))
+
+#n_distinct(participantsCount$ContactID[participantsCount$Retention_6_months==1])
+
+
+datatable(participants, rownames = FALSE, options = list(dom="t",pageLength = 1000, paging=FALSE),callback = JS(callback)) 
+```
+
+Of the `r n_distinct(participantsCount$ContactID[participantsCount$Retention_6_months==1])` participants who retained their jobs at least 6 months, the breakdown of different job types that were retained is below: 
+
+```{r fig.height=4}
+
+
+
+JobTypesRetained<-contactsProcessedReasons%>%
+  filter(Retention_6_months==1|Retention_9_months==1|Retention_12_months==1)%>%
+  group_by(Earliest.Job.Placement.Type)%>%
+  add_count()%>%
+  ungroup()%>%
+  mutate(Earliest.Job.Placement.Type = fct_reorder(Earliest.Job.Placement.Type, n, .desc = FALSE))
+
+#levels(JobTypesRetained$Earliest.Job.Placement.Type)
+#JobTypesRetained$Earliest.Job.Placement.Type
+
+ggplot(JobTypesRetained, aes(x=Earliest.Job.Placement.Type))+
   coord_flip()+
   geom_text(stat='count', aes(label=..count..), hjust=-.5, size=2.5)+
   geom_bar(fill="#951B0D")+theme_minimal()
