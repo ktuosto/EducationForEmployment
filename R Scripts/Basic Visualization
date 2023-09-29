@@ -1,0 +1,139 @@
+---
+title: "DataKindDC"
+author: "Kristen Tuosto"
+date: "2023-09-16"
+output: html_document
+---
+
+```{r}
+library(dplyr)
+
+df <- read.csv("C:/Users/ktuos/Downloads/contactsProcessed_and_JobData_Clean - contactsProcessed_and_JobData_Clean.csv")
+
+six_month_retained <- read.csv("C:/Users/ktuos/Desktop/six_month_retained.csv")
+
+df_merge <- merge(df, six_month_retained, by="ContactID")
+
+```
+
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(Hmisc)
+library(dplyr)
+library(forcats)
+
+```
+
+
+```{r}
+
+df_merge$Gender <- as.factor(df_merge$Gender)
+
+df_merge %>% group_by(Gender, six_month_retained) %>% summarise(N = n()) %>%
+  ggplot(aes(Gender, N,fill=factor(six_month_retained))) + geom_bar(stat = 'identity')+
+  labs(fill='Six Month Retained', y = "Count", x = "Gender") + geom_text(aes(label = N), vjust = -0.5, size = 3) + theme_classic()  # Add count labels
+
+#ggsave("Gender.jpg", width = 6, height = 4, units = "in")
+
+df_merge %>% group_by(Gender, six_month_retained) %>% summarise(N = n()) %>%
+  ggplot(aes(six_month_retained, N,fill=factor(Gender))) + geom_bar(stat = 'identity')+
+  labs(fill='Gender', y = "Count", x = "Six Month Retained") + geom_text(aes(label = N), vjust = -0.5, size = 3) + theme_classic()
+
+#ggsave("Gender1.jpg", width = 6, height = 4, units = "in")
+
+df_merge %>% group_by(Nationality, six_month_retained) %>% summarise(N = n()) %>%
+  ggplot(aes(Nationality, N,fill=factor(six_month_retained))) + geom_bar(stat = 'identity')+
+  labs(fill='Six Month Retained', y = "Count", x = "Nationality") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust =1)) + geom_text(aes(label = N), vjust = -0.5, size = 3) + theme_classic()  # Add count labels
+
+#ggsave("Nationality.jpg", width = 6, height = 4, units = "in")
+
+df_merge %>% group_by(Gender, six_month_retained, Nationality) %>% summarise(N = n()) %>%
+  ggplot(aes(Gender, N,fill=factor(six_month_retained))) + geom_bar(stat = 'identity')+
+  labs(fill='Six Month Retained', y = "Count", x = "Nationality") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust =1) ) + facet_grid(.~Nationality) + geom_text(aes(label = N), vjust = -0.5, size = 3) + theme_classic()  # Add count labels
+
+#ggsave("Gender & Nationality.jpg", width = 6, height = 4, units = "in")
+
+df_merge %>%
+  group_by(Nationality, Gender, six_month_retained) %>%
+  summarise(N = n()) %>%
+  ggplot(aes(Nationality, N, fill = factor(six_month_retained))) +
+  geom_bar(stat = 'identity') +
+  labs(fill = 'Six Month Retained', y = 'Count', x = 'Nationality') +
+  facet_grid(. ~ Gender) + geom_text(aes(label = N), vjust = -0.5, size = 3) + theme_classic() + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))   # Add count labels
+
+
+#ggsave("Nationality & Gender.jpg", width = 6, height = 4, units = "in")
+
+```
+
+```{r}
+df_merge %>% group_by(Gender, six_month_retained, Nationality, Position_Type) %>% summarise(N = n()) %>%
+  ggplot(aes(Position_Type, N,fill=factor(six_month_retained))) + geom_bar(stat = 'identity')+
+  labs(fill='Six Month Retained', y = "Count", x = "Nationality") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust =1)) + facet_grid(.~Nationality) 
+```
+```{r}
+
+df_merge$six_month_retained <- as.factor(df_merge$six_month_retained)
+
+df_merge %>% group_by(Gender, six_month_retained, Nationality, Position_Type) %>% summarise(N = n()) %>% ggplot(aes(x = Position_Type, y = N, fill = six_month_retained)) +
+  geom_bar(stat = 'identity', position = 'dodge') +
+  facet_grid(Nationality ~ Gender) +
+  labs(fill = 'Six Month Retained', y = 'Count', x = 'Position_Type') + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust =1))
+
+df_merge %>% group_by(six_month_retained, Nationality, First_Industry_Business) %>% summarise(N = n()) %>% ggplot(aes(x = First_Industry_Business, y = N, fill = six_month_retained)) +
+  geom_bar(stat = 'identity', position = 'dodge') +
+  facet_grid(.~Nationality) +
+  labs(fill = 'Six Month Retained', y = 'Count', x = 'First Industry Business') + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust =1))
+
+df_merge %>% group_by(Gender, six_month_retained, Nationality, First_Industry_Business) %>% summarise(N = n()) %>% ggplot(aes(x = First_Industry_Business, y = N, fill = six_month_retained)) +
+  geom_bar(stat = 'identity', position = 'dodge') +
+  facet_grid(Nationality ~ Gender) +
+  labs(fill = 'Six Month Retained', y = 'Count', x = 'First Industry Business') + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust =1))
+
+df_merge %>% group_by(six_month_retained, Nationality, EFE_Training_Relevance_to_Sector) %>% summarise(N = n()) %>% ggplot(aes(x = EFE_Training_Relevance_to_Sector, y = N, fill = six_month_retained)) +
+  geom_bar(stat = 'identity', position = 'dodge') +
+  facet_grid(.~Nationality) +
+  labs(fill = 'Six Month Retained', y = 'Count', x = 'EFE Training Relevance to Sector') + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust =1))
+
+df_merge %>% group_by(Gender, six_month_retained, Nationality, EFE_Training_Relevance_to_Sector) %>% summarise(N = n()) %>% ggplot(aes(x = EFE_Training_Relevance_to_Sector, y = N, fill = six_month_retained)) +
+  geom_bar(stat = 'identity', position = 'dodge') +
+  facet_grid(Nationality ~ Gender) +
+  labs(fill = 'Six Month Retained', y = 'Count', x = 'EFE Training Relevance to Sector') + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust =1))
+
+df_merge %>% group_by(six_month_retained, Nationality, EFE_Training_Relevance_to_Sector, First_Industry_Business) %>% summarise(N = n()) %>% ggplot(aes(x = First_Industry_Business, y = N, fill = EFE_Training_Relevance_to_Sector)) +
+  geom_bar(stat = 'identity', position = 'dodge') +
+  facet_grid(.~Nationality) +
+  labs(fill = 'Six Month Retained', y = 'Count', x = 'EFE Training Relevance to Sector') + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust =1))
+```
+```{r}
+df_merge %>%
+  group_by(Gender, six_month_retained, Nationality, Position_Type) %>%
+  summarise(N = n()) %>%
+  na.omit() %>%
+  ggplot(aes(Position_Type, N, fill = factor(six_month_retained))) +
+  geom_bar(stat = 'identity') +
+  labs(fill = 'Six Month Retained', y = 'Count', x = 'Position_Type') +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+  facet_grid(. ~ Nationality + Gender)
+
+df_merge %>%
+  group_by(Gender, six_month_retained, Nationality, Position_Type) %>%
+  summarise(N = n()) %>%
+  na.omit() %>%
+  ggplot(aes(Position_Type, N, fill = factor(six_month_retained))) +
+  geom_bar(stat = 'identity') +
+  geom_text(aes(label = N), vjust = -0.5, size = 3) +  # Add count labels
+  labs(fill = 'Six Month Retained', y = 'Count', x = 'Position_Type') +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+  facet_grid(. ~ Nationality + Gender)
+
+```
+
